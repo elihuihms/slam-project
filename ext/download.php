@@ -36,7 +36,7 @@ if( (count($config->errors) == 0) && ($access > 0) )
 {
 	if (empty($_REQUEST['asset_file']))
 		die('No file specified.');
-	elseif(($path = SLAM_getArchivePath(&$config,$category,$identifier)) === false)
+	elseif(($path = SLAM_getArchivePath($config,$category,$identifier)) === false)
 		die('There are no files attached to this asset.');
 	
 	$file = base64_decode($_REQUEST['asset_file']);

@@ -129,7 +129,7 @@ function SLAM_deleteAssetFiles(&$config,$category,$identifier)
 		deletes the file archive of an asset
 	*/
 	
-	if(($path = SLAM_getArchivePath(&$config,$category,$identifier)) !== false)
+	if(($path = SLAM_getArchivePath($config,$category,$identifier)) !== false)
 		if(!unlink($path))
 			$config->errors[]='File manager error: Could not delete asset archive.';
 	

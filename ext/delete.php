@@ -34,7 +34,7 @@ else // possibly a new asset
 /* if we've encountered any errors at this point, bail */
 if( (count($config->errors) == 0) && ($access > 1) )
 {
-	if(($path = SLAM_getArchivePath(&$config,$category,$identifier)) === false)
+	if(($path = SLAM_getArchivePath($config,$category,$identifier)) === false)
 		die('There are no files attached to this asset.');
 			
 	/* go through the arguments and look for files for deletion */

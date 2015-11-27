@@ -235,7 +235,7 @@ function SLAM_deleteAssets(&$config, $db, &$user, &$request)
 	$result = new SLAMresult($config, $db, $user, $request);
 	
 	/* drop them from the user's prefs first */
-	SLAM_dropAssetTags($config,$db,&$user,$request);
+	SLAM_dropAssetTags($config,$db,$user,$request);
 	
 	/* iterate through the categories and assets to be dropped */
 	foreach($result->assets as $category=>$assets)
