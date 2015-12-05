@@ -47,12 +47,15 @@ class SLAMresult
 			foreach( $fields as $name  )
 			{
 				if( $name == '' )
-					pass;
-				elseif( is_array($structure[ $name ]) )
+					continue;
+				elseif( array_key_exists($name,$structure) )
 					$this->fields[ $category ][ $name ] = $structure[ $name ];
 				else
 					$this->fields[ $category ][ $name ] = array();
 			}
+			
+			/* pre-create the categories for the assets as well */
+			$this->assets[$category] = array();
 		}
 		return true;
 	}
@@ -66,8 +69,6 @@ class SLAMresult
 
 		foreach($request->categories as $category => $identifiers)
 		{
-			$this->assets[$category] = array();
-
 			/* if the order-by field isn't in this category, default to Identifier */
 			if(!in_array($request->order['field'],array_keys($this->fields[$category])))				
 				$request->order['field'] = 'Identifier';

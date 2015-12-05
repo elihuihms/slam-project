@@ -10,7 +10,9 @@ function SLAM_makeBreadcrumbHTML($config,$db,$user,$request,$results)
 	$categories = array_keys($request->categories);
 
 	/* set the current categor(ies) */
-	if (count($categories) == 1)
+	if ($request->location == 'dash')
+		$s.=" &raquo; <a href='".$request->makeRequestURL($config,array('location'=>'dash'),false)."'>Dashboard</a>";
+	elseif (count($categories) == 1)
 		$s.=" &raquo; <a href='".$request->makeRequestURL($config,array('category'=>$categories,'location'=>'list'),false)."'>{$categories[0]}</a>";
 	elseif(count($categories) > 1)
 		$s.=" &raquo; (Multiple Categories)";
@@ -22,12 +24,12 @@ function SLAM_makeBreadcrumbHTML($config,$db,$user,$request,$results)
 	{
 		if((count($categories) == 1) && (count($request->categories[$categories[0]])==1))
 			$s.=" &raquo; <a href='".$request->makeRequestURL($config,array(),true)."'>{$results->assets[$categories[0]][0]['Identifier']}</a>";
-		elseif(count($request->assets)>1)
+		elseif(count($results->assets)>1)
 			$s.=" &raquo; (Multiple Assets)";
 	}
-
+	
 	$b = ($user->superuser) ? '?superuser=true' : '';
-	return "$s$a<a id='breadCrumbUser' href='#' onClick=\"togglePopupMenu('pub/user_actions.php$b','userActionsMenu',alignToBottomRight('breadCrumbUser')); return false\">$user->username</a></div>\n";
+	return "$s<a id='breadCrumbUser' href='#' onClick=\"togglePopupMenu('pub/user_actions.php$b','userActionsMenu',alignToBottomRight('breadCrumbUser')); return false\">$user->username</a></div>\n";
 }
 
 function SLAM_makeCategoryListHTML($config,$db,$user,$request)

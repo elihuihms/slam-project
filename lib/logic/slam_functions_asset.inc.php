@@ -41,10 +41,10 @@ function SLAM_setAssetFields($config,$db,$user,$category,$structure,$clone=false
 	{
 		if ($clone)
 			$fields[ $name ]=$clone[ $name ];
-		else
+		elseif($name != 'permissions')
 			$fields[ $name ]=$value['default'];
 	}
-					
+		
 	/* set permissions */
 	SLAM_setDefaultPerms( $fields, $config, $user, $clone );
 	if(array_key_exists($config->values['permissions']['owner_field'],$fields))
@@ -107,10 +107,12 @@ function SLAM_saveAssetEdits(&$config,$db,&$user,$request)
 		/* are we creating a new entry? */
 		if ( $_REQUEST['new'] )
 		{
-			if ( ($s = insertNewAsset( $config, $db, $user, $category, $asset)) !== True)
+			if( ($s = insertNewAsset( $config, $db, $user, $category, $asset)) !== True)
 				return $s;
-			else
+			elseif( ($s = SLAM_moveTemporaryArchiveFile($config,$db,$category,$asset['Identifier'],$_REQUEST['tempfileid'])) === True )
 				SLAM_updateArchiveFileList($config,$db,$category,$asset['Identifier']);
+			else
+				return $s;
 		}
 		elseif( is_array($identifiers) )
 		{
@@ -297,13 +299,13 @@ function SLAM_setDefaultPerms( &$asset, $config, $user=false, $clone=false )
 	else
 		$asset['permissions']['projects'] = array();
 	
-	if( is_numeric($user->prefs['default_project_access']) )
-		$asset['permissions']['project_access'] = $user->prefs['default_project_access'];
+	if( $user and array_key_exists('default_project_access',$user->prefs) )
+		$asset['permissions']['project_access'] = (int)$user->prefs['default_project_access'];
 	else
 		$asset['permissions']['project_access'] = (int)$config->values['permissions']['default_project_access'];
 	
-	if( is_numeric($user->prefs['default_access']) )
-		$asset['permissions']['default_access'] = $user->prefs['default_access'];
+	if( $user and array_key_exists('default_access',$user->prefs) )
+		$asset['permissions']['default_access'] = (int)$user->prefs['default_access'];
 	else
 		$asset['permissions']['default_access'] = (int)$config->values['permissions']['default_access'];
 

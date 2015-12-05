@@ -144,23 +144,23 @@ class SLAMrequest
 		$url = array();
 		
 		/* abbreviation translation table for convinence */
-		$abbr = array('action'=>'a','location'=>'loc','limit'=>'lim','order'=>'ord','direction'=>'dir');
-		
+		$abbr = array('action'=>'a','location'=>'loc','limit'=>'lim','order'=>'ord','direction'=>'dir','field'=>'field');
+	
 		foreach($args as $name=>$values)
 			if ((!is_array($values)) && (!empty($values)))
 				$url[] = "{$abbr[$name]}=".urlencode($values);			
 		
 		if (!empty($args['identifier']))
-			$url[] = 'i[]='.implode('&i[]=',array_map(urlencode,$args['identifier']));
+			$url[] = 'i[]='.implode('&i[]=',array_map('urlencode',$args['identifier']));
 		if (!empty($args['category']))
-			$url[] = 'cat[]='.implode('&cat[]=',array_map(urlencode,$args['category']));
+			$url[] = 'cat[]='.implode('&cat[]=',array_map('urlencode',$args['category']));
 			
-		if (is_array($args['search']))
+		if (array_key_exists('search',$args) and is_array($args['search']))
 		{
-			if (!empty($args['search']['field'])){ $url[] = 's_field[]='.implode('&s_field[]=',array_map(urlencode,$args['search']['field'])); }
-			if (!empty($args['search']['value'])){ $url[] = 's_value[]='.implode('&s_value[]=',array_map(urlencode,$args['search']['value'])); }
-			if (!empty($args['search']['mode'])){ $url[] = 's_mode[]='.implode('&s_mode[]=',array_map(urlencode,$args['search']['mode'])); }
-			if (!empty($args['search']['join'])){ $url[] = 's_join[]='.implode('&s_join[]=',array_map(urlencode,$args['search']['join'])); }
+			if (!empty($args['search']['field'])){ $url[] = 's_field[]='.implode('&s_field[]=',array_map('urlencode',$args['search']['field'])); }
+			if (!empty($args['search']['value'])){ $url[] = 's_value[]='.implode('&s_value[]=',array_map('urlencode',$args['search']['value'])); }
+			if (!empty($args['search']['mode'])){ $url[] = 's_mode[]='.implode('&s_mode[]=',array_map('urlencode',$args['search']['mode'])); }
+			if (!empty($args['search']['join'])){ $url[] = 's_join[]='.implode('&s_join[]=',array_map('urlencode',$args['search']['join'])); }
 		}
 
 		return "{$config->html['url']}?".implode('&',$url);

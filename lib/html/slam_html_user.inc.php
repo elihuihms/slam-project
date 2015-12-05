@@ -7,8 +7,9 @@ function SLAM_makeUserAuthHTML(&$config,$db,$user)
 	*/
 	
 	$config->html['js'][] = 'js/detect.js';
+	$username = array_key_exists('login_username',$_REQUEST) ? $_REQUEST['login_username'] : "";
 	
-	$s.=<<<EOL
+	$s =<<<EOL
 
 <script>
 	var stat = checkBrowser();
@@ -20,7 +21,7 @@ else if (stat < 2)
 <form name='loginForm' action='{$config->html['url']}' method='POST'>
 <div id='authContainer'>
 <table id='authFields'>
-<tr><td class='authTitle'>Username:</td><td class='authField'><input name='login_username' value='{$_REQUEST['login_username']}' /></td>\n</tr>
+<tr><td class='authTitle'>Username:</td><td class='authField'><input name='login_username' value='$username' /></td>\n</tr>
 <tr><td class='authTitle'>Password:</td><td class='authField'><input name='login_password' type='password' /></td>\n</tr>
 </table>
 <input type='submit' value='Log In' />

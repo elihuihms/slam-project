@@ -10,7 +10,7 @@ function SLAM_getModules(&$config,$dir,$ini)
 	}
 
 	$enabled = array();
-	if(is_array($module_names['enabled']))
+	if(array_key_exists('enabled',$module_names) && is_array($module_names['enabled']))
 	{
 		foreach($module_names['enabled'] as $name)
 		{

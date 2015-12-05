@@ -158,7 +158,8 @@ function SLAM_makeAssetTableHTML($config,$db,$user,$request,$category,$assets)
 					$s.="<td class='assetListField'><input type='button' class='listFileButton' onClick=\"showFileManager('ext/files.php?i={$asset['Identifier']}'); return false\" value='View' />\n";					
 			}
 			else
-				$s.= ($f_value == $value) ? "<td class='$class'>$value</td>\n" : "<td class='$class' title='{$asset[$field]}'>$value</td>\n";
+				$s.="<td class='$class' title='{$asset[$field]}'>$value</td>\n";
+				//$s.= ($f_value == $value) ? "<td class='$class'>$value</td>\n" : "<td class='$class' title='{$asset[$field]}'>$value</td>\n"
 		}
 		
 		$s.="</tr>\n";

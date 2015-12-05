@@ -18,10 +18,14 @@ class SLAMconfig
 		$this->values['build'] = '20130329';
 		
 		// do some basic initializing
-		$http = ($_SERVER['HTTPS'] == 'on') ? 'https://' : 'http://';
+		if( array_key_exists('HTTPS',$_SERVER) )
+			$http = ($_SERVER['HTTPS'] == 'on') ? 'https://' : 'http://';
+		else
+			$http = 'http://';
 		$this->html['url'] = $http.dirname($_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME']).'/';
 		$this->html['headers'] = array();
 		$this->html['onload'] = array();
+		$this->html['abort'] = '';
 			
 		$this->values = array_merge($this->values,$this->parse_config());
 		$this->values = array_merge($this->values,$this->parse_prefs());
@@ -36,7 +40,7 @@ class SLAMconfig
 
 		if(empty($this->values['user_table']))
 			exit("The \"category_table\" option in the \"configuration.ini\" file is missing. Please check your configuration file or contact your system administrator.");			
-		
+				
 		return;
 	}
 

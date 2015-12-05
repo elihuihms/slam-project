@@ -23,18 +23,27 @@ $path		= SLAM_getArchivePath($config,$category,$identifier);
 $access		= 0;
 
 /* get asset and set the accessibility appropriately */
-if( count($result->assets[$category]) == 1 )
+if( array_key_exists('tempfileid',$_REQUEST) )
+{
+	/* if the asset hasn't been created yet, use the tempfileid */
+	$path = SLAM_getTempArchivePath($config,$_REQUEST['tempfileid']);
+	$access = 3;
+}
+elseif( count($result->assets[$category]) == 1 )
 {
 	$asset = array_shift($result->assets[ $category ]);	
 	$access = SLAM_getAssetAccess($user, $asset);		
 }
-else // possibly a new asset
-	$access = 2;
+else
+{
+	$config->errors[] = 'Invalid identifier provided.';
+	$access = 0;
+}
 
 /* if we've encountered any errors at this point, bail */
 if( (count($config->errors) == 0) && ($access > 1) )
 {
-	if(($path = SLAM_getArchivePath($config,$category,$identifier)) === false)
+	if($path === false)
 		die('There are no files attached to this asset.');
 			
 	/* go through the arguments and look for files for deletion */
@@ -60,11 +69,17 @@ if( (count($config->errors) == 0) && ($access > 1) )
 	}
 }
 
+/* if we have a temporary file id, pass that along as well */
+if( array_key_exists('tempfileid',$_REQUEST) )
+	$tempfileid = '&tempfileid='.$_REQUEST['tempfileid'];
+else
+	$tempfileid = '';
+
 /* immediately redirect on success, or give the user a chance to see any errors we've run into */
 if (count($config->errors) == 0)
-	header("refresh:0;url=../ext/files.php?i=$identifier");
+	header("refresh:0;url=../ext/files.php?i=$identifier$tempfileid");
 else
-	header("refresh:{$config->values['file manager']['action_timeout']};url=../ext/files.php?i=$identifier");
+	header("refresh:{$config->values['file manager']['action_timeout']};url=../ext/files.php?i=$identifier$tempfileid");
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
 <html>
@@ -83,7 +98,7 @@ else
 		print "</div>";
 	}
 
-	print "<div id='actionContinueDiv'>Please <a href='../ext/files.php?i=$identifier'>click here</a> to continue.</div>";
+	print "<div id='actionContinueDiv'>Please <a href='../ext/files.php?i=$identifier$tempfileid'>click here</a> to continue.</div>";
 ?>
 	</body>
 </html>

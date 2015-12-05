@@ -25,6 +25,8 @@ if ($user->authenticated)
 	SLAM_doModuleRequest($modules,$config,$db,$user,$request);
 
 	/* perform built-in request actions if necessary */
+	$result = false;
+	$content = false;
 	switch($request->action)
 	{
 		case 'none':
@@ -114,7 +116,7 @@ if ($config->html['abort'])
 	echo $content;
 	return;
 }
-elseif($_REQUEST['user_action']) /* has the user specified an action (e.g. logging in, requesting a password reset?) */
+elseif(array_key_exists('user_action',$_REQUEST)) /* has the user specified an action (e.g. logging in, requesting a password reset?) */
 	$content.= SLAM_doUserAction($config,$db,$user);
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">

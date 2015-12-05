@@ -4,7 +4,7 @@ $slam_file_errors['zip_errors'] = array('No error','No error','Unexpected end of
 $slam_file_errors['unzip_errors'] = array('No error','One or more warnings were encountered, but processing completed successfully anyway','A generic error in the zipfile format was detected','A severe error in the zipfile format was detected.','unzip was unable to allocate itself memory.','unzip was unable to allocate memory, or encountered an encryption error','unzip was unable to allocate memory during decompression to disk','unzip was unable allocate memory during in-memory decompression','unused','The specified zipfiles were not found','Bad command line parameters','No matching files were found','50'=>'The disk is (or was) full during extraction',51=>'The end of the ZIP archive was encountered prematurely.',80=>'The user aborted unzip prematurely.',81=>'Testing or extraction of one or more files failed due to unsupported compression methods or unsupported decryption.',82=>'No files were found due to bad decryption password(s)');
 
 function SLAM_getArchivePath(&$config,$category,$identifier)
-{	
+{
 	/*
 		This function attempts to locate the archive file for the requested record, and returns a file path on success
 	
@@ -14,8 +14,8 @@ function SLAM_getArchivePath(&$config,$category,$identifier)
 	*/
 		
 	$cats = array_flip($config->values['lettercodes']);
-	$path = "{$config->values['file manager']['archive_dir']}/{$config->values['lab_prefix']}{$cats[$category]}/{$identifier}.zip";	
-		
+	$path = $config->values['file manager']['archive_dir'].DIRECTORY_SEPARATOR.$config->values['lab_prefix'].$cats[$category].DIRECTORY_SEPARATOR."{$identifier}.zip";	
+
 	if (file_exists($path) && (!is_readable($path)))
 		$config->errors[]='File manager error: Asset file exists, but is not readable. (Permissions error?)';
 	elseif (!file_exists($path))
@@ -79,6 +79,28 @@ function SLAM_getArchiveFiles(&$config,$path)
 	return $files;
 }
 
+function SLAM_getTempArchivePath($config,$filename)
+{
+	$path = $config->values['file manager']['temp_dir'].DIRECTORY_SEPARATOR.basename($filename).'.zip';
+	if (file_exists($path) && (!is_readable($path)))
+		$config->errors[]="File manager error: Temporary asset file exists ($path), but is not readable. (Permissions error?)";
+				
+	return $path;
+}
+
+function SLAM_moveTemporaryArchiveFile($config,$db,$category,$identifier,$tempfileid)
+{
+	$temppath = SLAM_getTempArchivePath($config,$tempfileid);
+	$destpath = SLAM_getArchivePath($config,$category,$identifier);
+	
+	if (@rename($temppath,$destpath) !== true)
+	{
+		$config->errors[] = "File \"${tempfileid}.zip\" could not be moved from temporary upload folder to \"$destpath\". Perhaps access permissons are incorrect?";
+		return SLAM_makeErrorHTML('Asset file archive error. Could not update archive location.',true);
+	}
+	return true;
+}
+
 function SLAM_updateArchiveFileList(&$config,$db,$category,$identifier)
 {
 	$path	= SLAM_getArchivePath($config,$category,$identifier);
@@ -97,7 +119,7 @@ function SLAM_updateArchiveFileList(&$config,$db,$category,$identifier)
 	return;
 }
 
-function SLAM_appendToAssetArchive($path,$file)
+function SLAM_appendToAssetArchive(&$config,$path,$file)
 {
 	global $slam_file_errors;
 		
@@ -110,14 +132,13 @@ function SLAM_appendToAssetArchive($path,$file)
 	
 	/* attempt to append uploaded file to zip archive */
 	exec("zip -j $path $file",$output,$status);
-
 	if ($status > 0)
 	{
 		if( key_exists($status, $slam_file_errors['zip_errors']) )
 			$config->errors[] = "File manager error: Zip error: {$slam_file_errors['zip_errors'][$status]}";
 		else
 			$config->errors[] = sprintf("File manager error: Attempting to call zip returned nonzero status %i : %s",$status,$output[0]);
-		break;
+		return false;
 	}
 				
 	return true;

@@ -96,9 +96,7 @@ class SLAMdb
 		}
 				
 		// define the regex
-		$config->values['identifier_regex'] = "/([A-Za-z][A-Za-z])(".implode('|',array_keys($config->values['lettercodes'])).")[_]?(\d+)/";
-		
-		return $ret;	
+		$config->values['identifier_regex'] = "/([A-Za-z][A-Za-z])(".implode('|',array_keys($config->values['lettercodes'])).")[_]?(\d+)/";		
 	}
 	
 	private function loadProjects(&$config)

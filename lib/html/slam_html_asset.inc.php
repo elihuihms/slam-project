@@ -123,11 +123,21 @@ EOL;
 				break;
 				
 			case 'Files': /* if there's a "Files" field, show a link to the file browser instead */
-				$b.="<tr>\n<td class='assetEditField'>Files :</td><td class='assetEditValue'><input type='button' class='assetFileButton' onClick=\"showFileManager('ext/files.php?i={$fields['Identifier']}'); return false\" value='Open Browser' /></td><td class='assetEditFunction'>&nbsp;</td>\n</tr>\n";
+
+				/* generate a temporary ID for the asset archive */
+				if (($request->action == 'new') || ($request->action == 'clone'))
+				{
+					$tempfileid = makeRandomAlpha(8);
+					$b.=SLAM_makeHiddenInput( $tempfileid ,'tempfileid');	
+					$b.="<tr>\n<td class='assetEditField'>Files :</td><td class='assetEditValue'><input type='button' class='assetFileButton' onClick=\"showFileManager('ext/files.php?i={$fields['Identifier']}&tempfileid=".$tempfileid."'); return false\" value='Attach Files' /></td><td class='assetEditFunction'>&nbsp;</td>\n</tr>\n";
+				}
+				else
+					$b.="<tr>\n<td class='assetEditField'>Files :</td><td class='assetEditValue'><input type='button' class='assetFileButton' onClick=\"showFileManager('ext/files.php?i={$fields['Identifier']}'); return false\" value='Open Browser' /></td><td class='assetEditFunction'>&nbsp;</td>\n</tr>\n";
+
 				break;
 		
 			default:
-				if ($scheme['hidden'] && !$user->superuser)
+				if (array_key_exists('hidden',$scheme) && $scheme['hidden'] && !$user->superuser)
 					$b.=SLAM_makeHiddenInput($fields[$name],'edit_'.base64_encode($scheme['name']));
 				else
 					$b.=SLAM_makeFieldHTML($config,$request,$fields[$name],$scheme,$editable,$collapsed);
@@ -215,6 +225,7 @@ function SLAM_makeFieldHTML($config,$request,$v,$s,$e,$h)
 		$b = SLAM_makeProjectMenuHTML($config,$v,$s,$n,$e);
 	
 	/* should the file be a linked identifier field? */
+	$f = '';
 	if ( preg_match('/^(\#\w+)/',$s['comment'],$m) > 0 )
 	{
 		$f = SLAM_makeIdentifierMenuHTML($config,$request,$v,$s,"name='$n' id='$n'");
@@ -280,8 +291,11 @@ function SLAM_makeIdentifierMenuHTML($config,$request,$v,$s,$n)
 	
 	// get list of linkable identifier elements
 	preg_match_all($config->values['identifier_regex'],$v,$m);
-	$url = "{$config->html['url']}?action=open&rloc={$request->location['return']}&identifier=";
-	
+	$url = "{$config->html['url']}?action=open&rloc={$request->location}&identifier=";
+
+	if(count($m[0])==0)
+		return '<!-- empty -->';
+
 	$a=array();
 	foreach($m[0] as $k=>$match)
 		$a["{$m[1][$k]}{$m[2][$k]}_{$m[3][$k]}"] = $request->makeRequestURL($config,array('identifier'=>array("{$m[1][$k]}{$m[2][$k]}_{$m[3][$k]}")),true);

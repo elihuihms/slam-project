@@ -3,21 +3,21 @@
 	require('lib/actions.inc.php');
 			
 	# Read the default settings either from the previously-entered options, or from the default file
-	if (file_exists('./step_1.ini'))
-		$defaults = parse_ini_file('./step_1.ini');
+	if (file_exists('step_1.ini'))
+		$defaults = parse_ini_file('step_1.ini');
 	else
-		$defaults = parse_ini_file('./defaults.ini');
+		$defaults = parse_ini_file('defaults.ini');
 	
 	if ($defaults['SLAM_CONF_PATH'] == 'auto')
-		$defaults['SLAM_CONF_PATH'] = str_replace('/install','',dirname(realpath($_SERVER['SCRIPT_FILENAME'])));
+		$defaults['SLAM_CONF_PATH'] = str_replace(DIRECTORY_SEPARATOR.'install','',dirname(realpath($_SERVER['SCRIPT_FILENAME'])));
 		
 	if ($defaults['SLAM_CONF_HEADER'] == 'auto')
 		$defaults['SLAM_CONF_HEADER'] = 'From: SLAM <'.$_SERVER['SERVER_ADMIN'].'>';
 	
 	if ($defaults['SLAM_FILE_ARCH_DIR'] == 'auto')
-		$defaults['SLAM_FILE_ARCH_DIR'] = str_replace('/install','/slam_files',dirname(realpath($_SERVER['SCRIPT_FILENAME'])));
+		$defaults['SLAM_FILE_ARCH_DIR'] = str_replace(DIRECTORY_SEPARATOR.'install',DIRECTORY_SEPARATOR.'slam_files',dirname(realpath($_SERVER['SCRIPT_FILENAME'])));
 	if ($defaults['SLAM_FILE_TEMP_DIR'] == 'auto')
-		$defaults['SLAM_FILE_TEMP_DIR'] = str_replace('/install','/slam_files/temp',dirname(realpath($_SERVER['SCRIPT_FILENAME'])));
+		$defaults['SLAM_FILE_TEMP_DIR'] = str_replace(DIRECTORY_SEPARATOR.'install',DIRECTORY_SEPARATOR.'slam_files'.DIRECTORY_SEPARATOR.'temp',dirname(realpath($_SERVER['SCRIPT_FILENAME'])));
 ?>
 <html>
 	<head>

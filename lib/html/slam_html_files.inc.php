@@ -2,6 +2,12 @@
 
 function SLAM_makeArchiveFilesHTML($config,$db,$category,$identifier,$files,$editable)
 {
+	/* if we're operating off a temporary file id, we'll need to pass that to download.php */
+	if( array_key_exists('tempfileid',$_REQUEST) )
+		$tempfileid = '&tempfileid='.$_REQUEST['tempfileid'];
+	else
+		$tempfileid = '';
+
 	$s = "<table id='fileListTable'>\n";
 	$s.= "<tr id='fileListHeader'>\n";
 	if ($editable)
@@ -27,8 +33,8 @@ EOL;
 		if ($editable)
 			$s.="<td style='text-align:center'><input type='checkbox' name='FL_del-".base64_encode($name)."' /></td>";
 			
-		$save_url = "download.php?i={$identifier}&asset_file=".base64_encode($name);
-		$view_url = "download.php?i={$identifier}&asset_file=".base64_encode($name)."&inline=true";
+		$save_url = "download.php?i={$identifier}{$tempfileid}&asset_file=".base64_encode($name);
+		$view_url = "download.php?i={$identifier}{$tempfileid}&asset_file=".base64_encode($name)."&inline=true";
 		
 		if (in_array(strtolower($pathinfo['extension']),$config->values['file manager']['inline_formats']))
 			$open_url = "<a href='$save_url'>save</a>/<a href='$view_url' target='_new'>view</a>";

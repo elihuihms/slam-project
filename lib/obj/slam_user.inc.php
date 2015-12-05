@@ -44,7 +44,7 @@ class SLAMuser
 
 	private function loaduser(&$config,$db,$username,$password)
 	{
-		if ($_REQUEST['logout']){
+		if( array_key_exists('logout',$_REQUEST) ){
 			setcookie("slam_{$config->values['lab_prefix']}",'',time()-3600,'/');
 			return false;
 		}
@@ -52,16 +52,16 @@ class SLAMuser
 		$this->username = $username;
 		
 		/* is the user attempting to log in? */
-		if (($_REQUEST['login_username']) && ($_REQUEST['login_password']))
+		if (array_key_exists('login_username',$_REQUEST) && array_key_exists('login_password',$_REQUEST))
 		{
 			$this->username = $_REQUEST['login_username'];
 			$password = $_REQUEST['login_password'];
 		}
-		elseif($_REQUEST['auth']) /* is the user sending an auth variable? */
+		elseif(array_key_exists('auth',$_REQUEST)) /* is the user sending an auth variable? */
 		{
 			list($this->username,$password) = explode(':',base64_decode($_REQUEST['auth']));
 		}
-		elseif($_COOKIE["slam_{$config->values['lab_prefix']}"]) /* does the user possess an auth cookie? */
+		elseif(array_key_exists("slam_".$config->values['lab_prefix'],$_COOKIE)) /* does the user possess an auth cookie? */
 		{
 			$crypt = sql_real_escape(urldecode($_COOKIE["slam_{$config->values['lab_prefix']}"]),$db->link);
 			$auth = $db->GetRecords("SELECT * FROM `{$config->values['user_table']}` WHERE `crypt`='$crypt' LIMIT 1");

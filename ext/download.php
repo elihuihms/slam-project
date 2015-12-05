@@ -23,20 +23,29 @@ $path		= SLAM_getArchivePath($config,$category,$identifier);
 $access		= 0;
 
 /* get asset and set the accessibility appropriately */
-if( count($result->assets[$category]) == 1 )
+if( array_key_exists('tempfileid',$_REQUEST) )
+{
+	/* if the asset hasn't been created yet, use the tempfileid */
+	$path = SLAM_getTempArchivePath($config,$_REQUEST['tempfileid']);
+	$access = 3;
+}
+elseif( count($result->assets[$category]) == 1 )
 {
 	$asset = array_shift($result->assets[ $category ]);	
 	$access = SLAM_getAssetAccess($user, $asset);		
 }
-else // possibly a new asset
-	$access = 2;
+else
+{
+	$config->errors[] = 'Invalid identifier provided.';
+	$access = 0;
+}
 
 /* if we've encountered any errors at this point, bail */
 if( (count($config->errors) == 0) && ($access > 0) )
 {
 	if (empty($_REQUEST['asset_file']))
 		die('No file specified.');
-	elseif(($path = SLAM_getArchivePath($config,$category,$identifier)) === false)
+	elseif($path === false)
 		die('There are no files attached to this asset.');
 	
 	$file = base64_decode($_REQUEST['asset_file']);

@@ -18,7 +18,7 @@ function SLAM_makeDashboardHTML(&$config,$db,$user,$request,$result)
 	$s = "<div id='dashboardTitle'>{$user->username}'s Dashboard</div>\n";
 	
 	$categories = array_keys($request->categories);
-	if($_REQUEST['d_status'])
+	if(array_key_exists('d_status',$_REQUEST))
 		$s.="<div id='dashboardStatus'>Searching ".count($categories)." categories</div>\n";
 	elseif(!empty($request->search))
 		$s.="<div id='dashboardStatus'>Viewing search results</div>\n";
@@ -41,7 +41,7 @@ function SLAM_makeDashboardSearchHTML($config,$db,$user,$request)
 
 	$s ="<form name='selectSearchCategories' action='".$request->makeRequestURL($config,array('category'=>array()),true)."&d_status=select' method='POST'>\n";
 	$s.="<div id='dashboardSearchContainer'>\n";
-	if (! $_REQUEST['d_status']=='select')
+	if (!array_key_exists('d_status',$_REQUEST))
 		$s.=SLAM_makeButtonHTML('Multi-category search',"onClick=\"toggleHideBodyId('dashboardSearchReveal')\"",false);
 //	else
 //		$s.=SLAM_makeButtonHTML('Cancel',"onClick=\"hideBodyId('searchContainer')\"",false);
@@ -55,7 +55,7 @@ function SLAM_makeDashboardSearchHTML($config,$db,$user,$request)
 	$s.="</div>\n";
 	$s.="</form>\n";
 	
-	if (($_REQUEST['d_status']=='select') || (!empty($request->search)))
+	if (array_key_exists('d_status',$_REQUEST))
 	{
 		/* make a temporary result containing just the structures of the requested tables */
 		$result = new SLAMresult();
@@ -72,21 +72,18 @@ function SLAM_makeDashboardListHTML(&$config,$db,$user,$request,$result)
 	if (empty($result->assets))
 		return "<div id='dashboardNoEntries'><span>No assets to show</span></div>\n";	
 		
-	$s.="<form name='dashboardListForm' action='".$request->makeRequestURL($config,array('location'=>'dash','order'=>$request->order),false)."' method='POST'>\n";
+	$s ="<form name='dashboardListForm' action='".$request->makeRequestURL($config,array('location'=>'dash','order'=>$request->order),false)."' method='POST'>\n";
 	$s.= "<div id='assetListContainer'>\n";
 	
 	/* are we to automatically tag entries from these categories? */
 	$tag = (empty($request->search)) ? '&tag=true' : '';
 	
-	/* display the different tables */
+	/* display the different asset categories each in their own table */
 	foreach($result->assets as $category => $assets)
 	{
 		/* append the category name */
 		$s.="<div class='assetListName'><a href='#' onClick=\"toggleHideBodyId('assetListTable_{$category}'); return false;\" >$category</a> <input type='button' value='New' onClick=\"location.href='index.php?a=new&cat={$category}&loc=dash$tag'\"/></div>\n";
 		$s.=SLAM_makeAssetTableHTML($config,$db,$user,$request,$category,$assets);
-		
-		if ($assets != $result->assets[count($result->assets) -1])
-			$s.="</form>\n";
 	}
 
 	$s.=SLAM_makeDashTableActions($category,!empty($request->search));

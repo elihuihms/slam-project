@@ -21,15 +21,24 @@ $category	= array_shift(array_keys($request->categories));
 $identifier	= array_shift($request->categories[ $category ]);
 $path		= SLAM_getArchivePath($config,$category,$identifier);
 $access		= 0;
-
+	
 /* get asset and set the accessibility appropriately */
-if( count($result->assets[$category]) == 1 )
+if( array_key_exists('tempfileid',$_REQUEST) )
+{
+	/* if the asset hasn't been created yet, use the tempfileid */
+	$path = SLAM_getTempArchivePath($config,$_REQUEST['tempfileid']);
+	$access = 2;
+}
+elseif( count($result->assets[$category]) == 1 )
 {
 	$asset = array_shift($result->assets[ $category ]);	
 	$access = SLAM_getAssetAccess($user, $asset);		
 }
 else // possibly a new asset
-	$access = 2;
+{
+	$config->errors[] = 'Invalid identifier provided.';
+	$access = 0;
+}
 
 /* if we've encountered any errors at this point, bail */
 if( (count($config->errors) == 0) && ($access > 1) )
@@ -47,10 +56,10 @@ if( (count($config->errors) == 0) && ($access > 1) )
 			{
 				# single quotes really mess with zip's ability to access file, may fix at a later date
 				$name = str_replace("\'",'',urldecode($_FILES['asset_file']['name'][$i]));
-
+				
 				/* move the uploaded file into the temporary directory for incorporation into the archive */
 				$temp = urldecode($_FILES['asset_file']['tmp_name'][$i]);
-				$file = "{$config->values['file manager']['temp_dir']}/$name";
+				$file = $config->values['file manager']['temp_dir'].DIRECTORY_SEPARATOR.$name;
 
 				/* note that this function cannot take escaped paths */
 				if (@move_uploaded_file($temp,$file) !== true)
@@ -58,7 +67,7 @@ if( (count($config->errors) == 0) && ($access > 1) )
 				
 				$file = escapeshellarg( $file );
 
-				if (($status = SLAM_appendToAssetArchive($path,$file)) !== true)
+				if (($status = SLAM_appendToAssetArchive($config,$path,$file)) !== true)
 					$config->errors[] = $status;
 				
 				/* remove the temporary file now that it's been added to the archive */
@@ -99,12 +108,17 @@ if( (count($config->errors) == 0) && ($access > 1) )
 	}
 }
 
+/* if we have a temporary file id, pass that along as well */
+if( array_key_exists('tempfileid',$_REQUEST) )
+	$tempfileid = '&tempfileid='.$_REQUEST['tempfileid'];
+else
+	$tempfileid = '';
 
 /* immediately redirect on success, or give the user a chance to see any errors we've run into */
 if (count($config->errors) == 0)
-	header("refresh:0;url=../ext/files.php?i=$identifier");
+	header("refresh:0;url=../ext/files.php?i=$identifier$tempfileid");
 else
-	header("refresh:{$config->values['file manager']['action_timeout']};url=../ext/files.php?i=$identifier");
+	header("refresh:{$config->values['file manager']['action_timeout']};url=../ext/files.php?i=$identifier$tempfileid");
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
 <html>
@@ -123,7 +137,7 @@ else
 		print "</div>";
 	}
 	
-	print "<div id='actionContinueDiv'>Please <a href='../ext/files.php?i=$identifier'>click here</a> to continue.</div>";
+	print "<div id='actionContinueDiv'>Please <a href='../ext/files.php?i=$identifier$tempfileid'>click here</a> to continue.</div>";
 ?>
 	</body>
 </html>

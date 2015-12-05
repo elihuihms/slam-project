@@ -33,22 +33,27 @@ $path		= SLAM_getArchivePath($config,$category,$identifier);
 $access		= 0;
 
 /* get asset and set the accessibility appropriately */
-if( count($result->assets[$category]) == 1 )
+if( array_key_exists('tempfileid',$_REQUEST) )
+{
+	/* if the asset hasn't been created yet, use the tempfileid */
+	$path = SLAM_getTempArchivePath($config,$_REQUEST['tempfileid']);
+	$access = 3;
+}
+elseif( count($result->assets[$category]) == 1 )
 {
 	$asset = array_shift($result->assets[ $category ]);	
 	$access = SLAM_getAssetAccess($user, $asset);		
 }
-else /* possibly a new asset */
+else
 {
 	$config->errors[] = 'Invalid identifier provided.';
-	$access = 2;
+	$access = 0;
 }
 
 /* is the current user qualified to make changes to the archive? */
 if( $access > 0)
 {
-	/* attempt to retrieve the asset's archive path*/
-	if(($path = SLAM_getArchivePath($config,$category,$identifier)) !== false)
+	if($path !== false)
 	{
 		/* retrieve info on the files in the archive */
 		if(($files = SLAM_getArchiveFiles($config,$path)) !== false)
@@ -57,12 +62,12 @@ if( $access > 0)
 			echo "<div id='fileListScrollbox'>\n";
 			echo "<form name='assetFileRemove' id='assetFileRemove' method='POST' action='delete.php'>\n";
 			echo "<input type='hidden' name='i' value='$identifier' />\n";
+			echo array_key_exists('tempfileid',$_REQUEST) ? "<input type='hidden' name='tempfileid' value='{$_REQUEST['tempfileid']}' />\n" : '';
 			echo SLAM_makeArchiveFilesHTML($config,$db,$category,$identifier,$files,($access>1));
 			echo "</div>\n";
 			if ($access>1)
 				echo "<input type='button' id='deleteButton' value='Delete' onClick=\"delete_submit('assetFileRemove')\" />\n";
 			echo "</form>\n";
-			echo "</div>\n";
 		}
 		else
 			echo "<div id='fileEmpty'>No files to show</div>\n";
@@ -81,7 +86,9 @@ if(!empty($config->values['debug']))
 	echo "</div>\n";
 }
 
-if ($access > 1)
+if(array_key_exists('tempfileid',$_REQUEST))
+	echo "";
+elseif($access > 1)
 	SLAM_updateArchiveFileList($config,$db,$category,$identifier);
 else
 {
@@ -90,11 +97,11 @@ else
 }
 
 ?>
-</form>
 		</div>
 		<div id='fileUploadContainer'>
 			<form name="assetFileUpload" id="assetFileUpload" method="POST" action="upload.php" enctype="multipart/form-data">
-				<input type="hidden" name="i" value="<?php echo($identifier); ?>" />
+				<?php echo "<input type='hidden' name='i' value='$identifier' />\n"; ?>
+				<?php echo array_key_exists('tempfileid',$_REQUEST) ? "<input type='hidden' name='tempfileid' value='{$_REQUEST['tempfileid']}' />\n" : ""; ?>
 				<table id='fileUploadTable'>
 					<tr>
 						<td style='width:250px;font-family:monospace;text-align: center'>

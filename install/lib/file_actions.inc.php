@@ -41,6 +41,7 @@ function checkFileList( $file_list_path )
 
 function checkExecCommand($cmd)
 {
+	/* @TODO@ Make compatible for windows? */
 	if(function_exists('exec'))
 	{
 		$cmd = escapeshellcmd($cmd);

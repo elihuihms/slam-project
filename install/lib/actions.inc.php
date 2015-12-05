@@ -62,7 +62,7 @@ function check_SLAM_options()
 	$options = array_merge($ini[0], $ini[1], $ini[2], $ini[3] );
 	
 	/* step 1 options */
-	$path = rtrim( $options['SLAM_CONF_PATH'],'/');
+	$path = rtrim( $options['SLAM_CONF_PATH'],DIRECTORY_SEPARATOR);
 	if( ($ret = checkDirectoryIsRW( $path )) !== true )
 		$errors['Step 1 A'] ="SLAM installation path error: $ret";
 	if (strlen($options['SLAM_CONF_PREFIX']) != 2)
@@ -71,8 +71,8 @@ function check_SLAM_options()
 	if( ($ret = checkDbOptions( $options['SLAM_DB_HOST'], $options['SLAM_DB_NAME'], $options['SLAM_DB_USER'], $options['SLAM_DB_PASS'] )) !== true )
 		$errors['Step 1 C'] = "SLAM database connection error: {$ret[0]}";
 	
-	$arch_path = rtrim( base64_decode($options['SLAM_FILE_ARCH_DIR']),'/');
-	$temp_path = rtrim( base64_decode($options['SLAM_FILE_TEMP_DIR']),'/');
+	$arch_path = rtrim( base64_decode($options['SLAM_FILE_ARCH_DIR']),DIRECTORY_SEPARATOR);
+	$temp_path = rtrim( base64_decode($options['SLAM_FILE_TEMP_DIR']),DIRECTORY_SEPARATOR);
 	
 	if( ($ret = checkFileOptions( $arch_path, $temp_path )) !== true )
 		$errors['Step 1 D'] = "SLAM attached file settings: {$ret[0]} {$ret[1]}";
@@ -135,9 +135,9 @@ function write_SLAM_config( )
 			return array(mysql_error());
 	
 	/* step 1 options */
-	$options['SLAM_CONF_PATH'] = rtrim($options['SLAM_CONF_PATH'],'/');
-	$options['SLAM_FILE_ARCH_DIR'] = rtrim($options['SLAM_FILE_ARCH_DIR'],'/');
-	$options['SLAM_FILE_TEMP_DIR'] = rtrim($options['SLAM_FILE_TEMP_DIR'],'/');
+	$options['SLAM_CONF_PATH'] = rtrim($options['SLAM_CONF_PATH'],DIRECTORY_SEPARATOR);
+	$options['SLAM_FILE_ARCH_DIR'] = rtrim($options['SLAM_FILE_ARCH_DIR'],DIRECTORY_SEPARATOR);
+	$options['SLAM_FILE_TEMP_DIR'] = rtrim($options['SLAM_FILE_TEMP_DIR'],DIRECTORY_SEPARATOR);
 	
 	if( !file_exists($options['SLAM_FILE_ARCH_DIR']) )
 		if( !mkdir($options['SLAM_FILE_ARCH_DIR']) )
@@ -219,12 +219,12 @@ function write_SLAM_config( )
 	# get installation path
 	$path = $options['SLAM_CONF_PATH'];
 
-	if( file_put_contents( "{$path}/configuration.ini", $config_ini) === false )
+	if( file_put_contents( $path.DIRECTORY_SEPARATOR."configuration.ini", $config_ini) === false )
 		return array("Could not write configuration file.");
-	if( file_put_contents( "{$path}/preferences.ini", $prefs_ini) === false)
+	if( file_put_contents( $path.DIRECTORY_SEPARATOR."preferences.ini", $prefs_ini) === false)
 		return array("Could not write preferences file.");
 	
-	if( !unlink('./step_1.ini') || !unlink('./step_2.ini') || !unlink('./step_3.ini') || !unlink('./step_4.ini') )
+	if( !unlink('step_1.ini') || !unlink('step_2.ini') || !unlink('step_3.ini') || !unlink('step_4.ini') )
 		return array("Could not remove step setup files.");
 	
 	return true;
