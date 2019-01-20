@@ -89,7 +89,7 @@ function SLAM_saveAssetTags($config,$db,&$user,$request)
 	/* append the tagged identifiers to the user's preferences' identifier array */
 	foreach($request->categories as $category=>$assets)
 	{
-		if (!is_array($user->prefs['identifiers'][$category]))
+		if (!array_key_exists($category,$user->prefs['identifiers']) || !is_array($user->prefs['identifiers'][$category]))
 			$user->prefs['identifiers'][$category] = array();
 			
 		$user->prefs['identifiers'][$category] = array_unique(array_merge($user->prefs['identifiers'][$category],$assets));
@@ -100,7 +100,7 @@ function SLAM_saveAssetTags($config,$db,&$user,$request)
 		$config->errors[] = 'Could not sort user tagged assets.';
 
 	/* safety check to remove any reset secret still hanging around */
-	if ($user->prefs['reset_secret'])
+	if (array_key_exists('reset_secret',$user->prefs))
 		unset($user->prefs['reset_secret']);
 		
 	/* save the modified list back to the user's record */

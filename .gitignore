@@ -1,3 +1,10 @@
+# macintosh garbage
+._*
+.DS_Store
+
+# php logging
+error_log
+
+# SLAM-specified config files
 configuration.ini
 preferences.ini
-/admin

@@ -29,12 +29,15 @@ class SLAMuser
 //			if(count($this->projects) == 0)
 //				$this->projects = array( $this->values['username'] );
 			
-			/* prefs already loaded by loaduser() */
-			if(!is_numeric($this->prefs['default_project_access']))
+			/* prefs already loaded by loaduser(), set defaults if not provided */
+			if(!array_key_exists('default_project_access', $this->prefs) || !is_numeric($this->prefs['default_project_access']))
 				$this->prefs['default_project_access'] = (int)$config->values['permissions']['default_project_access'];
 			
-			if(!is_numeric($this->prefs['default_access']))
+			if(!array_key_exists('default_access', $this->prefs) || !is_numeric($this->prefs['default_access']))
 				$this->prefs['default_access'] = (int)$config->values['permissions']['default_access'];
+
+			if(!array_key_exists('identifiers', $this->prefs))
+				$this->prefs['identifiers'] = array();
 
 			$this->prefs['failed_logins'] = 0;
 		}

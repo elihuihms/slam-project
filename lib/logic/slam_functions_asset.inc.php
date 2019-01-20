@@ -105,7 +105,7 @@ function SLAM_saveAssetEdits(&$config,$db,&$user,$request)
 			$asset['permissions'] = json_decode(base64_decode($_REQUEST['permissions']));
 		
 		/* are we creating a new entry? */
-		if ( $_REQUEST['new'] )
+		if (array_key_exists('new', $_REQUEST))
 		{
 			if( ($s = insertNewAsset( $config, $db, $user, $category, $asset)) !== True)
 				return $s;
