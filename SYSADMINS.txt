@@ -4,12 +4,12 @@ Notes for Sysadmins
 Supported Operating Systems
 ---------------------------
 
-SLAM has not been tested with Windows based operating systems and likely will not work (but you're welcome to try!). SteelSnowflake LLC currently has no plans to develop such a version.
+SLAM has not been tested with WAMP stacks, but if you get it working we'd love to hear about it.
 
 Basic Requirements
 ------------------
 
-* PHP 5.2.0+ (SLAM will not install with earlier versions)
+* PHP 7.0+
 * MySQL 5.0+ (Earlier versions may work, but have not been tested).
 
 Installation Options
@@ -32,4 +32,4 @@ You may wish to edit your php.ini in order to attach files larger than the 5MB d
 Other considerations
 --------------------
 
-SLAM has not be tested with PHP's Safe Mode. Problems are likely to be encountered when attaching asset files. If you encounter problems, please leave a trouble report ticket at SLAM's google code issue tracker at code.google.com/p/slam-project/issues
+SLAM has not be tested with PHP's Safe Mode, problems are likely to be encountered when attaching asset files. If you encounter issues, please open an issue at SLAM's github repo, github.com/steelsnowflake/slam.

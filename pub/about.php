@@ -6,16 +6,16 @@
 <div style='text-align:center'>
 	<div>
 		<p style='font-weight:bold;margin-bottom:5px'>SLAM v.<?php echo($config->values['version']) ?> build <?php echo($config->values['build']) ?></p>
-		<a href='http://code.google.com/p/slam-project/' target='_new'>code.google.com/p/slam-project/</a>
+		<a href='https://github.com/steelsnowflake/slam/' target='_blank'>github.com/steelsnowflake/slam</a>
 	</div>
 	<div>
 		<p style='font-weight:bold;margin-bottom:5px'>&copy; 2012 <a href='http://steelsnowflake.com'>SteelSnowflake LLC</a></p>
 	</div>
 	<div>
 		<p style='font-weight:bold;margin-bottom:5px'>Special thanks:</p>
-		The <a href='http://chemistry.osu.edu/~foster.281/' target='_new'>Mark Foster</a> lab
+		The <a href='https://research.cbc.osu.edu/foster.281/' target='_blank'>Mark Foster</a> lab
 		<br />
-		The <a href='http://www.osu.edu' target='_new'>Ohio State University</a>
+		The <a href='https://www.osu.edu' target='_blank'>Ohio State University</a>
 	</div>
 	<div>
 		<p style='font-style:italic;margin-bottom:5px'>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.

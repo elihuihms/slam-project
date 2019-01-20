@@ -150,7 +150,7 @@ if(!empty($config->values['debug']))
 	echo "</div>\n";
 }
 ?>
-		<div id='contentFooter'>SLAM v. <?php echo($config->values['version']) ;?> &copy; <a href='#' onClick="showPopupDiv('pub/about.php','helpDiv',{}); return false">SteelSnowflake</a> LLC<br />[<a href="http://code.google.com/p/slam-project/issues/entry">Report a Bug</a>]</div>
+		<div id='contentFooter'>SLAM v. <?php echo($config->values['version']) ;?> &copy; <a href='#' onClick="showPopupDiv('pub/about.php','helpDiv',{}); return false">SteelSnowflake</a> LLC<br />[<a href="https://github.com/steelsnowflake/slam/issues" target="_blank" >Report a Bug</a>]</div>
 		</div>
 	</body>
 </html>
