@@ -92,7 +92,10 @@ function SLAM_moveTemporaryArchiveFile($config,$db,$category,$identifier,$tempfi
 {
 	$temppath = SLAM_getTempArchivePath($config,$tempfileid);
 	$destpath = SLAM_getArchivePath($config,$category,$identifier);
-	
+
+	if(!file_exists($temppath))
+		return true;
+
 	if (@rename($temppath,$destpath) !== true)
 	{
 		$config->errors[] = "File \"${tempfileid}.zip\" could not be moved from temporary upload folder to \"$destpath\". Perhaps access permissons are incorrect?";
