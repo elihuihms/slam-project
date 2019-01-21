@@ -34,7 +34,7 @@
 			<input type='hidden' name='STEP' value='1' />
 			<table id='configTable'>
 				<tr>
-					 <td class='helpHeader' colspan="2">For assistance, please refer to the SLAM documentation [<a href='http://steelsnowflake.com/SLAM' target='_new'>here</a>].</td>
+					 <td class='helpHeader' colspan="2">For assistance, please refer to the SLAM documentation [<a href='http://steelsnowflake.com/SLAM/installation' target='_blank'>here</a>].</td>
 				</tr>
 				<tr>
 					<td class='inputCategory' colspan='2'>General Settings</td>
@@ -71,6 +71,10 @@
 					<td class='inputValue'><input type='text' value='<?php print $defaults['SLAM_DB_NAME'] ?>' size='20' id='SLAM_DB_NAME' name='SLAM_DB_NAME' /></td>
 				</tr>
 				<tr>
+					<td class='inputField'>Database characterset:</td>
+					<td class='inputValue'><input type='text' value='<?php print $defaults['SLAM_DB_CHARSET'] ?>' size='20' id='SLAM_DB_CHARSET' name='SLAM_DB_CHARSET' /></td>
+				</tr>
+				<tr>
 					<td class='inputField'>Login name:</td>
 					<td class='inputValue'><input type='text' value='<?php print $defaults['SLAM_DB_USER'] ?>' size='20' id='SLAM_DB_USER' name='SLAM_DB_USER' /></td>
 				<tr>
@@ -103,7 +107,7 @@
 		</form>
 		<form name='back' action='index.php' method='post'>
 			<div class='actionButtons'>
-				<input type='submit' class="submitButton" value='Cancel these settings and Go Back' />
+				<input type='submit' class="submitButton" value='Save these settings and Go Back' />
 			</div>
 		</form>
 	</div></body>
