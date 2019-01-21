@@ -8,3 +8,7 @@ error_log
 # SLAM-specified config files
 configuration.ini
 preferences.ini
+install/step_?.ini
+
+# SLAM-specifed default file location
+slam_files

@@ -23,7 +23,7 @@ class SLAMuser
 			
 			/* extract user project groups */
 			if( $ret['projects'] != '')
-				$this->projects = split(',',$ret['projects']);
+				$this->projects = explode(',',$ret['projects']);
 			else
 				$this->projects = array();
 //			if(count($this->projects) == 0)
@@ -78,6 +78,9 @@ class SLAMuser
 				
 				$this->username = $auth[0]['username'];
 				$this->prefs = unserialize($auth[0]['prefs']);
+				if(!$this->prefs)
+					$this->prefs = array();
+
 				return $auth[0];
 			}
 			

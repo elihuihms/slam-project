@@ -68,7 +68,7 @@ function check_SLAM_options()
 	if (strlen($options['SLAM_CONF_PREFIX']) != 2)
 		$errors['Step 1 B'] = 'SLAM lab prefix must be precisely 2 characters';
 	
-	if( ($ret = checkDbOptions( $options['SLAM_DB_HOST'], $options['SLAM_DB_NAME'], $options['SLAM_DB_USER'], $options['SLAM_DB_PASS'] )) !== true )
+	if( ($ret = checkDbOptions( $options['SLAM_DB_HOST'], $options['SLAM_DB_NAME'], $options['SLAM_DB_USER'], $options['SLAM_DB_PASS'], $options['SLAM_DB_CHARSET'] )) !== true )
 		$errors['Step 1 C'] = "SLAM database connection error: {$ret[0]}";
 	
 	$arch_path = rtrim( base64_decode($options['SLAM_FILE_ARCH_DIR']),DIRECTORY_SEPARATOR);
@@ -90,8 +90,10 @@ function check_SLAM_options()
 
 function write_SLAM_config( )
 {
+	/* from db_schemas.inc.php */
 	global $sql_create_required;
 	global $sql_create_optional;
+	global $pdo_options;
 	
 	/* check for the presence of the template files */
 	$fail = array();
@@ -114,25 +116,25 @@ function write_SLAM_config( )
 	/* try and connect to the database */
 	$server = $options['SLAM_DB_HOST'];
 	$dbname = $options['SLAM_DB_NAME'];
+	$charset = $options['SLAM_DB_CHARSET'];
 	$dbuser = $options['SLAM_DB_USER'];
 	$dbpass = $options['SLAM_DB_PASS'];
 	
-	$link = @mysql_connect( $server, $dbuser, $dbpass, true );
-	if( $link === false)
-		return array("Could not connect to the database with the provided credentials:".mysql_error());
 	
-	if( mysql_select_db( $dbname, $link ) === false)
-	{
-		if( !mysql_query("CREATE DATABASE '$dbname'", $link) )
-			return array("Specified database '$dbname' doesn't exist and couldn't be created!");
-		elseif( !mysql_select_db( $dbname, $link ) )
-			return array("Created database '$dbname', but couldn't select it!");
+	try {
+		$pdo = new PDO("mysql:host=$server;dbname=$dbname;charset=$charset",$dbuser,$dbpass,$pdo_options);
+	} catch (PDOException $e) {
+		return array("Could not connect to the database with the provided credentials:$e");
 	}
 	
 	/* create the required tables */
-	foreach( $sql_create_required as $table )
-		if(mysql_query( $table['sql'], $link ) === false)
-			return array(mysql_error());
+	foreach( $sql_create_required as $table ){
+		try {
+			$pdo->query($table['sql']);
+		} catch (PDOException $e) {
+			return array($e);
+		}	
+	}
 	
 	/* step 1 options */
 	$options['SLAM_CONF_PATH'] = rtrim($options['SLAM_CONF_PATH'],DIRECTORY_SEPARATOR);
@@ -155,33 +157,46 @@ function write_SLAM_config( )
 		$prefix = $options['SLAM_OPTIONAL_PREFIX'][$i];
 		$sql = $sql_create_optional[ $name ]['sql'];
 		
-		if( mysql_query( $sql, $link ) === false )
-			return array(mysql_error());
+		try {
+			$pdo->query($sql);
+		} catch (PDOException $e) {
+			return array($e);
+		} 
 		
 		/* don't add the template category to the category list */
 		if( $name == 'Template' )
 			continue;
 		
 		/* add the categories to the category table */
-		if( SLAM_write_to_table( $link, 'SLAM_Categories', array('Name'=>$name,'Prefix'=>$prefix)) === false )
-			return array(mysql_error());
+		try {
+			SLAM_write_to_table( $pdo, 'SLAM_Categories', array('Name'=>$name,'Prefix'=>$prefix) );
+		} catch (PDOException $e) {
+			return array($e);
+		} 
 	}
 	
 	/* step 3 options */
 	if( $options['SLAM_CUSTOM_PROJECT'] != 'true' )
 		$options['SLAM_CUSTOM_PROJECT'] = 'false';
 	
-	foreach( $options['SLAM_PROJECT_NAME'] as $name )
-		if( SLAM_write_to_table( $link, 'SLAM_Projects', array('Name'=>$name) ) === false )
-			return array(mysql_error());
+	foreach( $options['SLAM_PROJECT_NAME'] as $name ){
+		try {
+			SLAM_write_to_table( $pdo, 'SLAM_Projects', array('Name'=>$name) );
+		} catch (PDOException $e) {
+			return array($e);
+		}
+	}
 	
 	/* step 4 options */
 		
 	/* make the superuser account */
 	$salt = makeRandomAlpha(8);
 	$crypt = sha1($salt.$options['SLAM_ROOT_PASS_1']);
-	if( SLAM_write_to_table( $link, 'SLAM_Researchers', array('username'=>$options['SLAM_ROOT_NAME'],'email'=>$options['SLAM_ROOT_EMAIL'],'crypt'=>$crypt,'salt'=>$salt,'superuser'=>'1') ) === false )
-		return array(mysql_error());
+	try {
+		SLAM_write_to_table( $pdo, 'SLAM_Researchers', array('username'=>$options['SLAM_ROOT_NAME'],'email'=>$options['SLAM_ROOT_EMAIL'],'crypt'=>$crypt,'salt'=>$salt,'superuser'=>'1') );
+	} catch (PDOException $e) {
+		return array($e);
+	}
 	
 	/* create the other accounts */
 	$errors = array();
@@ -199,15 +214,18 @@ function write_SLAM_config( )
 		else
 			$projects = '';
 		
-		if( SLAM_write_to_table( $link, 'SLAM_Researchers', array('username'=>$name,'email'=>$email,'crypt'=>$crypt,'salt'=>$salt,'superuser'=>'0','projects'=>$projects) ) === false )
-			$errors[] = mysql_error();
+		try {
+			SLAM_write_to_table( $pdo, 'SLAM_Researchers', array('username'=>$name,'email'=>$email,'crypt'=>$crypt,'salt'=>$salt,'superuser'=>'0','projects'=>$projects) );
+		} catch (PDOException $e) {
+			return array($e);
+		}
 	}
 
 	if( count($errors) > 0 )
 		return $errors;
 	
 	/* all done with the database */
-	mysql_close( $link );
+	$pdo = null;
 	
 	# write all of the simple replacements
 	foreach( $options as $key=>$value )

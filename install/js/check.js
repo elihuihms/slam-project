@@ -11,6 +11,7 @@ function checkDatabaseForm()
 	var str="./ext/check_db.php?";
 	str += "SLAM_DB_HOST="+encodeURIComponent(document.getElementById("SLAM_DB_HOST").value);
 	str += "&SLAM_DB_NAME="+encodeURIComponent(document.getElementById("SLAM_DB_NAME").value);
+	str += "&SLAM_DB_CHARSET="+encodeURIComponent(document.getElementById("SLAM_DB_CHARSET").value);
 	str += "&SLAM_DB_USER="+encodeURIComponent(document.getElementById("SLAM_DB_USER").value);
 	str += "&SLAM_DB_PASS="+encodeURIComponent(document.getElementById("SLAM_DB_PASS").value);
 

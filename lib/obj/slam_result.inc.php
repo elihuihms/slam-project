@@ -21,6 +21,7 @@ class SLAMresult
 	
 	public function getStructures(&$config,$db,$user,$request)
 	{
+		/* Set up the result with the structure of tables (categories) requested in $request. */
 		if (!is_array($request->categories))
 			return true;
 			
