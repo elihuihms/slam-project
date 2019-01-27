@@ -14,7 +14,7 @@ class SLAMdb
 
 	public function __construct(&$config)
 	{
-		if( $error = ($this->Connect($config->values['db_server'],$config->values['db_user'],$config->values['db_pass'],$config->values['db_name'],$config->values['db_charset'])) !== true)
+		if( $error = ($this->Connect( $config->values['db_server'],$conf->values['db_port'],$config->values['db_user'],$config->values['db_pass'],$config->values['db_name'],$config->values['db_charset'])) !== true)
 			die('Database error: Could not connect: '.$error);
 		
 		if(!($this->tables = $this->GetTables()))
@@ -39,7 +39,7 @@ class SLAMdb
 		$this->loadProjects($config);
 	}
 	
-	public	function Connect($server,$dbuser,$dbpass,$dbname,$charset)
+	public	function Connect($server,$dbport,$dbuser,$dbpass,$dbname,$charset)
 	{
 		/*
 			attempts to connect to a server and database
@@ -47,7 +47,7 @@ class SLAMdb
 		*/
 		
 		try{
-			$this->link = new PDO("mysql:host=$server;dbname=$dbname;charset=$charset",$dbuser,$dbpass,$this->pdo_options);
+			$this->link = new PDO("mysql:host={$server};port={$dbport};dbname={$dbname};charset={$charset}",$dbuser,$dbpass,$this->pdo_options);
 		}catch (PDOException $e){
 			return $e;
 		}

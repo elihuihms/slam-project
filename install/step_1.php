@@ -5,8 +5,18 @@
 	# Read the default settings either from the previously-entered options, or from the default file
 	if (file_exists('step_1.ini'))
 		$defaults = parse_ini_file('step_1.ini');
-	else
+	else {
 		$defaults = parse_ini_file('defaults.ini');
+
+		/* database defaults - AWS detection of env RDS */
+		if($_SERVER['RDS_HOSTNAME']){
+			$defaults['SLAM_DB_HOST'] = $_SERVER['RDS_HOSTNAME'];
+			$defaults['SLAM_DB_PORT'] = $_SERVER['RDS_PORT'];
+			$defaults['SLAM_DB_NAME'] = $_SERVER['RDS_DB_NAME'];
+			$defaults['SLAM_DB_USER'] = $_SERVER['RDS_USERNAME'];
+			$defaults['SLAM_DB_PASS'] = $_SERVER['RDS_PASSWORD'];
+		}
+	}
 	
 	if ($defaults['SLAM_CONF_PATH'] == 'auto')
 		$defaults['SLAM_CONF_PATH'] = str_replace(DIRECTORY_SEPARATOR.'install','',dirname(realpath($_SERVER['SCRIPT_FILENAME'])));
@@ -65,6 +75,10 @@
 				<tr>
 					<td class='inputField'>Server:</td>
 					<td class='inputValue'><input type='text' value='<?php print $defaults['SLAM_DB_HOST'] ?>' size='20' id='SLAM_DB_HOST' name='SLAM_DB_HOST' /></td>
+				</tr>
+				<tr>
+					<td class='inputField'>Port:</td>
+					<td class='inputValue'><input type='text' value='<?php print $defaults['SLAM_DB_PORT'] ?>' size='20' id='SLAM_DB_PORT' name='SLAM_DB_PORT' /></td>
 				</tr>
 				<tr>
 					<td class='inputField'>Database name:</td>

@@ -68,7 +68,7 @@ function check_SLAM_options()
 	if (strlen($options['SLAM_CONF_PREFIX']) != 2)
 		$errors['Step 1 B'] = 'SLAM lab prefix must be precisely 2 characters';
 	
-	if( ($ret = checkDbOptions( $options['SLAM_DB_HOST'], $options['SLAM_DB_NAME'], $options['SLAM_DB_USER'], $options['SLAM_DB_PASS'], $options['SLAM_DB_CHARSET'] )) !== true )
+	if( ($ret = checkDbOptions( $options['SLAM_DB_HOST'], $options['SLAM_DB_PORT'], $options['SLAM_DB_NAME'], $options['SLAM_DB_USER'], $options['SLAM_DB_PASS'], $options['SLAM_DB_CHARSET'] )) !== true )
 		$errors['Step 1 C'] = "SLAM database connection error: {$ret[0]}";
 	
 	$arch_path = rtrim( base64_decode($options['SLAM_FILE_ARCH_DIR']),DIRECTORY_SEPARATOR);
@@ -115,6 +115,7 @@ function write_SLAM_config( )
 		
 	/* try and connect to the database */
 	$server = $options['SLAM_DB_HOST'];
+	$port = $options['SLAM_DB_PORT'];
 	$dbname = $options['SLAM_DB_NAME'];
 	$charset = $options['SLAM_DB_CHARSET'];
 	$dbuser = $options['SLAM_DB_USER'];
@@ -122,7 +123,7 @@ function write_SLAM_config( )
 	
 	
 	try {
-		$pdo = new PDO("mysql:host=$server;dbname=$dbname;charset=$charset",$dbuser,$dbpass,$pdo_options);
+		$pdo = new PDO("mysql:host={$server};port={$port};dbname={$dbname};charset={$charset}",$port, $dbuser,$dbpass,$pdo_options);
 	} catch (PDOException $e) {
 		return array("Could not connect to the database with the provided credentials:$e");
 	}

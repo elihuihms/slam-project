@@ -12,3 +12,8 @@ install/step_?.ini
 
 # SLAM-specifed default file location
 slam_files
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml

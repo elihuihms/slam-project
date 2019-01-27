@@ -1,6 +1,6 @@
 <?php
 
-function checkDbOptions( $server, $dbname, $dbuser, $dbpass, $charset )
+function checkDbOptions( $server, $port, $dbname, $dbuser, $dbpass, $charset )
 {
 	global $pdo_options;
 
@@ -8,6 +8,8 @@ function checkDbOptions( $server, $dbname, $dbuser, $dbpass, $charset )
 
 	if ($server == '')
 		$fail[] = "Please specify a database server IP or 'localhost'";
+	if ($port == '')
+		$fail[] = "Please specify a database server port.";
 	if( $dbname == '')
 		$fail[] = "Please specify a database name.";
 	if( $charset == '')
@@ -20,7 +22,7 @@ function checkDbOptions( $server, $dbname, $dbuser, $dbpass, $charset )
 	if( count($fail) == 0 )
 	{
 		try{
-			$pdo = new PDO("mysql:host=$server;dbname=$dbname;charset=$charset",$dbuser,$dbpass,$pdo_options);
+			$pdo = new PDO("mysql:host={$server};port={$port};dbname={$dbname};charset={$charset}",$dbuser,$dbpass,$pdo_options);
 		}
 		catch (PDOException $e)
 		{
