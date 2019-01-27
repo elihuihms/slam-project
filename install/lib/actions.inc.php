@@ -123,7 +123,7 @@ function write_SLAM_config( )
 	
 	
 	try {
-		$pdo = new PDO("mysql:host={$server};port={$port};dbname={$dbname};charset={$charset}",$port, $dbuser,$dbpass,$pdo_options);
+		$pdo = new PDO("mysql:host={$server};port={$port};dbname={$dbname};charset={$charset}",$dbuser,$dbpass,$pdo_options);
 	} catch (PDOException $e) {
 		return array("Could not connect to the database with the provided credentials:$e");
 	}

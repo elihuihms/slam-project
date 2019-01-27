@@ -1,9 +1,8 @@
 <?php
 	require('lib/constants.inc.php');
-	
+	require('lib/actions.inc.php');
 	require('lib/db_actions.inc.php');
 	require('lib/file_actions.inc.php');
-	require('lib/actions.inc.php');
 
 	$fail = array();
 	

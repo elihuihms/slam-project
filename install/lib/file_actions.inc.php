@@ -45,7 +45,7 @@ function checkExecCommand($cmd)
 	if(function_exists('exec'))
 	{
 		$cmd = escapeshellcmd($cmd);
-	    exec("command -v $string >& /dev/null && echo 'Found' || echo 'Not Found'", $output);
+	    exec("command -v $cmd >& /dev/null && echo 'Found' || echo 'Not Found'", $output);
 
 	    if( $output[0] == "Found" )
 	        return true;

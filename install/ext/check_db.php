@@ -1,5 +1,6 @@
 <?php
 
+require('../lib/constants.inc.php'); /* for PDO options */
 require('../lib/db_actions.inc.php');
 
 $server = ($_REQUEST['SLAM_DB_HOST']);
