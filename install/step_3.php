@@ -37,7 +37,7 @@
 			<input type='hidden' name='STEP' value='3' />
 			<table id='configTable'>
 				<tr>
-					 <td class='helpHeader' colspan="2">For assistance, please refer to the SLAM documentation [<a href='http://steelsnowflake.com/SLAM/installation' target='_blank'>here</a>].</td>
+					 <td class='helpHeader' colspan="2">For assistance, please refer to the SLAM documentation [<a href='http://steelsnowflake.com/projects/SLAM/installation' target='_blank'>here</a>].</td>
 				</tr>
 				<tr>
 					<td class='inputCategory' colspan='2'>Project Setup</td>

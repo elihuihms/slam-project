@@ -14,8 +14,8 @@ class SLAMconfig
 	{
 		$this->errors = array();
 		
-		$this->values['version'] = '1.1';
-		$this->values['build'] = '20130329';
+		$this->values['version'] = '1.2';
+		$this->values['build'] = '20190127';
 		
 		// do some basic initializing
 		if( array_key_exists('HTTPS',$_SERVER) )
