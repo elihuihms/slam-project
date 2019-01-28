@@ -15,11 +15,11 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 * PHP 7.0+
 * MySQL 5.0+
 
-# QuickStart
+# Installation
 
-### Downloading a SLAM Package
+### Downloading a SLAM package
 
-You can download an archive from the following locations, untar/unzip it onto your web server, and you're good to go:
+You can download a complete archive from the following locations, untar/unzip it onto your web server, and you're good to go:
 
 * http://steelsnowflake.com/downloads/?t=slam-versions
 * https://github.com/steelsnowflake/slam/archive/master.zip
@@ -31,13 +31,13 @@ $ cd ~/webroot
 $ git clone https://github.com/steelsnowflake/slam.git
 ```
 
-Once SLAM has been saved to your server, navigate to yourserver.com/webroot/slam/install/index.php for a step-by-step, guided setup. Check out http://steelsnowflake.com/SLAM/installation for even more information.
+Once SLAM has been saved to your server, navigate to yourserver.com/slam/install/index.php for a step-by-step, guided setup. Check out http://steelsnowflake.com/SLAM/installation for even more information.
 
 ### AWS Elastic Beanstalk
 
-Installation to an Amazon Elastic Beanstalk is the recommended deployment option for most users. Select the preconfigured PHP platform, upload a SLAM .zip archive to initialize the environment, add a MySQL RDS, and once the environment is stable, navigate to the environment's URL.
+Installation to an Amazon Elastic Beanstalk is the recommended deployment option for most users. Select the preconfigured AWS PHP platform, upload a SLAM .zip archive to initialize the environment, add a MySQL RDS, and once the environment is stable, navigate to the environment's URL to complete installation.
 
-If added to the platform prior to running the installer, the environment's RDS connection and authentication settings will be provided as defaults during installation.
+If the database is added to the platform prior to running the installer, the environment's RDS connection and authentication settings will be provided as defaults during installation.
 
 # Advanced
 
