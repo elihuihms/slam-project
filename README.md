@@ -1,25 +1,21 @@
 ## Description
----
 
 SLAM (SQL-based Laboratory Asset Management) is a web-based application that helps research labs organize and maintain information on their key assets (plasmids, cell strains, purified protein lots, etc.). It was designed from the ground-up to be intuitive to use and easy to modify in order to suit each lab’s unique needs.
 
 SLAM's approach is to avoid vendor lock-in by acting as a thin veneer to a relational database. In this way, the database is used not only for storage of data, but as transparently as possible the structure for what pieces of data are critical for each asset type. This ensures that your data will always be easily retrievable, even by third-party utilities.
 
 ## License
----
 
 This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 ## Requirements
----
 
 * PHP 7.0 or later
 * MySQL 5.0 or later
 
 ## QuickStart
----
 
 ### Downloading a SLAM Package
 
@@ -44,7 +40,6 @@ Installation to an Amazon Elastic Beanstalk is the recommended deployment option
 If added to the platform prior to running the installer, the environment's RDS connection and authentication settings will be provided as defaults during installation.
 
 ## Advanced
----
 
 ### Attached Files
 
