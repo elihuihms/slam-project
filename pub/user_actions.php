@@ -4,6 +4,7 @@
 <?php
 if( $_REQUEST['superuser'] == 'true'){
 	echo("	<input type='button' value='Add User' onClick=\"showPopupDiv('pub/user_create.php','userActionPopup',{'noclose':true})\"/>\n");
+	echo("	<input type='button' value='Edit Database' onClick=\"window.open('admin.php')\"/>\n");
 }
 ?>	
 </form>

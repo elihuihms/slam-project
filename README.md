@@ -10,6 +10,8 @@ This program is free software; you can redistribute it and/or modify it under th
 
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
+SLAM includes code from the Adminer project (www.adminer.org), which is licensed under the Apache License 2.0 or GPL 2.
+
 # Requirements
 
 * PHP 7.0+
