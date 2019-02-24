@@ -117,15 +117,15 @@ class SLAMconfig
 			1.0 -> 1.2 patching
 		*/
 		$dirty = false;
-		if (!array_key_exists('db_port', $this->values) {
+		if (!array_key_exists('db_port', $this->values)) {
 			$old_config_arr = update_ini_file( $old_config_arr, 'db_server', "db_port=\"".$def_config_ini['db_port']."\"");
 			$dirty = true;
 		}
-		if (!array_key_exists('db_charset', $this->values) {
+		if (!array_key_exists('db_charset', $this->values)) {
 			$old_config_arr = update_ini_file( $old_config_arr, 'db_charset', "db_charset=\"".$def_config_ini['db_charset']."\"");
 			$dirty = true;
 		}
-		if ($dirty){
+		if ($dirty) {
 			$old_config_arr = update_ini_file( $old_config_arr, 'slam_version', "; Updated to version ".$this->values['version']." config style on ".date("Y-m-d H:i:s"));
 			$old_config_arr = update_ini_file( $old_config_arr, 'slam_version', "slam_version=\"".$this->values['version']."\"", true);
 			
