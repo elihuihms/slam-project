@@ -5,29 +5,9 @@
 	# Read the default settings either from the previously-entered options, or from the default file
 	if (file_exists('step_1.ini'))
 		$defaults = parse_ini_file('step_1.ini');
-	else {
-		$defaults = parse_ini_file('defaults.ini');
+	else
+		$defaults = update_auto_defaults(parse_ini_file('defaults.ini'));
 
-		/* database defaults - AWS detection of env RDS */
-		if($_SERVER['RDS_HOSTNAME']){
-			$defaults['SLAM_DB_HOST'] = $_SERVER['RDS_HOSTNAME'];
-			$defaults['SLAM_DB_PORT'] = $_SERVER['RDS_PORT'];
-			$defaults['SLAM_DB_NAME'] = $_SERVER['RDS_DB_NAME'];
-			$defaults['SLAM_DB_USER'] = $_SERVER['RDS_USERNAME'];
-			$defaults['SLAM_DB_PASS'] = $_SERVER['RDS_PASSWORD'];
-		}
-	}
-	
-	if ($defaults['SLAM_CONF_PATH'] == 'auto')
-		$defaults['SLAM_CONF_PATH'] = str_replace(DIRECTORY_SEPARATOR.'install','',dirname(realpath($_SERVER['SCRIPT_FILENAME'])));
-		
-	if ($defaults['SLAM_CONF_HEADER'] == 'auto')
-		$defaults['SLAM_CONF_HEADER'] = 'From: SLAM <'.$_SERVER['SERVER_ADMIN'].'>';
-	
-	if ($defaults['SLAM_FILE_ARCH_DIR'] == 'auto')
-		$defaults['SLAM_FILE_ARCH_DIR'] = str_replace(DIRECTORY_SEPARATOR.'install',DIRECTORY_SEPARATOR.'slam_files',dirname(realpath($_SERVER['SCRIPT_FILENAME'])));
-	if ($defaults['SLAM_FILE_TEMP_DIR'] == 'auto')
-		$defaults['SLAM_FILE_TEMP_DIR'] = str_replace(DIRECTORY_SEPARATOR.'install',DIRECTORY_SEPARATOR.'slam_files'.DIRECTORY_SEPARATOR.'temp',dirname(realpath($_SERVER['SCRIPT_FILENAME'])));
 ?>
 <html>
 	<head>

@@ -249,4 +249,32 @@ function write_SLAM_config( )
 	return true;
 }
 
+function update_auto_defaults($defaults) {
+	/*
+		Appropriately sets any 'auto' values in default.ini values
+	*/
+
+	/* database defaults - AWS detection of env RDS */
+	if($_SERVER['RDS_HOSTNAME']){
+		$defaults['SLAM_DB_HOST'] = $_SERVER['RDS_HOSTNAME'];
+		$defaults['SLAM_DB_PORT'] = $_SERVER['RDS_PORT'];
+		$defaults['SLAM_DB_NAME'] = $_SERVER['RDS_DB_NAME'];
+		$defaults['SLAM_DB_USER'] = $_SERVER['RDS_USERNAME'];
+		$defaults['SLAM_DB_PASS'] = $_SERVER['RDS_PASSWORD'];
+	}
+	
+	if ($defaults['SLAM_CONF_PATH'] == 'auto')
+		$defaults['SLAM_CONF_PATH'] = str_replace(DIRECTORY_SEPARATOR.'install','',dirname(realpath($_SERVER['SCRIPT_FILENAME'])));
+		
+	if ($defaults['SLAM_CONF_HEADER'] == 'auto')
+		$defaults['SLAM_CONF_HEADER'] = 'From: SLAM <'.$_SERVER['SERVER_ADMIN'].'>';
+	
+	if ($defaults['SLAM_FILE_ARCH_DIR'] == 'auto')
+		$defaults['SLAM_FILE_ARCH_DIR'] = str_replace(DIRECTORY_SEPARATOR.'install',DIRECTORY_SEPARATOR.'slam_files',dirname(realpath($_SERVER['SCRIPT_FILENAME'])));
+	if ($defaults['SLAM_FILE_TEMP_DIR'] == 'auto')
+		$defaults['SLAM_FILE_TEMP_DIR'] = str_replace(DIRECTORY_SEPARATOR.'install',DIRECTORY_SEPARATOR.'slam_files'.DIRECTORY_SEPARATOR.'temp',dirname(realpath($_SERVER['SCRIPT_FILENAME'])));
+
+	return $defaults;
+}
+
 ?>

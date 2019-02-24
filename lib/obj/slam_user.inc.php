@@ -54,13 +54,15 @@ class SLAMuser
 
 		$this->username = $username;
 		
-		/* is the user attempting to log in? */
-		if (array_key_exists('login_username',$_REQUEST) && array_key_exists('login_password',$_REQUEST))
+		if ($password!==false) {
+			/* a password has been explicitly provided */
+		}
+		elseif (array_key_exists('login_username',$_REQUEST) && array_key_exists('login_password',$_REQUEST)) /* is the user attempting to log in? */
 		{
 			$this->username = $_REQUEST['login_username'];
 			$password = $_REQUEST['login_password'];
 		}
-		elseif(array_key_exists('auth',$_REQUEST)) /* is the user sending an auth variable? */
+		elseif(array_key_exists('auth',$_REQUEST) && !is_array($_REQUEST['auth'])) /* is the user sending an auth variable? Note: adminer uses an "auth" header, but it's sent as an array*/
 		{
 			list($this->username,$password) = explode(':',base64_decode($_REQUEST['auth']));
 		}

@@ -13,13 +13,13 @@
 	if (file_exists('./step_4.ini'))
 		$defaults = parse_ini_file('./step_4.ini');
 	else
-		$defaults = parse_ini_file('./defaults.ini');
+		$defaults = update_auto_defaults(parse_ini_file('./defaults.ini'));
 	
 	# read the project options too
 	if (file_exists('./step_3.ini'))
 		$projects = parse_ini_file('./step_3.ini');
 	else
-		$projects = parse_ini_file('./defaults.ini');	
+		$projects = update_auto_defaults(parse_ini_file('./defaults.ini'));	
 ?>
 <html>
 	<head>

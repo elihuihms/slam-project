@@ -14,7 +14,7 @@
 	if (file_exists('./step_2.ini'))
 		$defaults = parse_ini_file('./step_2.ini');
 	else
-		$defaults = parse_ini_file('./defaults.ini');
+		$defaults = update_auto_defaults(parse_ini_file('./defaults.ini'));
 ?>
 <html>
 	<head>

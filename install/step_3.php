@@ -13,7 +13,7 @@
 	if (file_exists('./step_3.ini'))
 		$defaults = parse_ini_file('./step_3.ini');
 	else
-		$defaults = parse_ini_file('./defaults.ini');
+		$defaults = update_auto_defaults(parse_ini_file('./defaults.ini'));
 ?>
 <html>
 	<head>
