@@ -3,10 +3,12 @@
 	require('lib/actions.inc.php');
 			
 	# Read the default settings either from the previously-entered options, or from the default file
-	if (file_exists('step_1.ini'))
+	if (file_exists('step_1.ini')) {
 		$defaults = parse_ini_file('step_1.ini');
-	else
-		$defaults = update_auto_defaults(parse_ini_file('defaults.ini'));
+	} else {
+		$defaults = parse_ini_file('defaults.ini');
+		update_auto_defaults($defaults);
+	}
 
 ?>
 <html>

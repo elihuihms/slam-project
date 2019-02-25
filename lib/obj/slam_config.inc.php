@@ -33,11 +33,13 @@ class SLAMconfig
 		$this->values = array_merge($this->values,$this->parse_prefs());
 
 		/* check to see if we're using an old config file version */
-		if(!array_key_exists('slam_version', $this->values))
-			$this->values['slam_version'] = '1.0';
-		if($this->values['version'] != $this->values['slam_version']) {
+		if (!array_key_exists('config_version', $this->values))
+			$this->values['config_version'] = '1.0';
+
+		if (trim($this->values['version']) != trim($this->values['config_version'])) {
 			$this->update_config();
 			$this->values = array_merge($this->values,$this->parse_config());
+			$this->errors[] = "Note: updated config file to version ".$this->values['version'].".";
 		}
 		
 		/* check for some absolutely required values in the config file */
@@ -78,26 +80,35 @@ class SLAMconfig
 		return $r;
 	}
 
-	private function update_ini_file($lines, $after_key, $new_line, $replace=False) {
+	private function update_ini_file(&$lines, $new_line, $after_key=false, $replace=false)
+	{
 		/*
-			Provided an array (of lines) from an ini-type file, insert $new_line after the specified key. If replace==true, replace the line completely.
+			Provided an array (of lines) from an ini-formatted file, insert $new_line after the specified key. If replace==true, replace the line completely.
+			Returns true if the addition or replacement has been performed (i.e. if the $after_key was found), otherwise false.
 		*/
 
-		for ($i=0; $i<count($old_config_arr); $i++) {
+		for ($i=0; $i<count($lines); $i++) {
 			$line = explode("=", $lines[$i]);
-			if ( rtrim($line[0]) == $after_key ) {
+			if ( $i == 0 && $after_key === false) {
+				array_unshift( $lines, $new_line );
+				return true;
+			} else if ( rtrim($line[0]) == $after_key ) {
 				if ($replace) {
 					$lines[$i] = $new_line;
-				} else {
-					$lines = array_splice( $lines, $i+1, 0, array($new_line) );
+					return true;
+				}
+				else {
+					array_splice( $lines, $i+1, 0, $new_line );
+					return true;
 				}
 			}
 		}
 
-		return $lines;
+		return false;
 	}
 
-	private function update_config() {
+	private function update_config()
+	{
 		/*
 			updates an old config file to conform with the new style
 		*/
@@ -111,25 +122,27 @@ class SLAMconfig
 		if (($def_config_ini = @parse_ini_file('install'.DIRECTORY_SEPARATOR.'defaults.ini',true)) === false)
 			exit("Fatal error: Could not read configuration defaults during update of old configuration.ini. Please contact your system administrator.");
 
-		$def_config_ini = update_auto_defaults($def_config_init); /* replace any 'auto' values */
+		update_auto_defaults($def_config_ini); /* replace any 'auto' values */
 
 		/*
 			1.0 -> 1.2 patching
 		*/
 		$dirty = false;
 		if (!array_key_exists('db_port', $this->values)) {
-			$old_config_arr = update_ini_file( $old_config_arr, 'db_server', "db_port=\"".$def_config_ini['db_port']."\"");
+			$this->update_ini_file( $old_config_arr, 'db_port = "'.$def_config_ini['SLAM_DB_PORT'].'"', 'db_server');
 			$dirty = true;
 		}
 		if (!array_key_exists('db_charset', $this->values)) {
-			$old_config_arr = update_ini_file( $old_config_arr, 'db_charset', "db_charset=\"".$def_config_ini['db_charset']."\"");
+			$this->update_ini_file( $old_config_arr, 'db_charset = "'.$def_config_ini['SLAM_DB_CHARSET'].'"', 'db_name');
 			$dirty = true;
 		}
 		if ($dirty) {
-			$old_config_arr = update_ini_file( $old_config_arr, 'slam_version', "; Updated to version ".$this->values['version']." config style on ".date("Y-m-d H:i:s"));
-			$old_config_arr = update_ini_file( $old_config_arr, 'slam_version', "slam_version=\"".$this->values['version']."\"", true);
+			if (!$this->update_ini_file( $old_config_arr, 'config_version = "'.$this->values['version'].'"', 'config_version', true))
+				$this->update_ini_file( $old_config_arr, 'config_version = "'.$this->values['version'].'"');
+			$this->update_ini_file( $old_config_arr, '; Updated to version '.$this->values['version'].' config style on '.date('Y-m-d H:i:s'));
 			
-			if (file_put_contents('configuration.ini', implode(PHP_EOL, $old_config_arr)) !== true)
+			copy( 'configuration.ini', 'configuration-'.time().'.ini');
+			if (file_put_contents('configuration.ini', implode(PHP_EOL, $old_config_arr)) === false)
 				exit("Fatal error: Could not write updates to configuration.ini. Please contact your system administrator.");
 		}
 	}

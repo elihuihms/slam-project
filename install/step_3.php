@@ -10,10 +10,12 @@
 			$fail[] = "Could not save your progress. Please contact your system administrator: $ret";
 	
 	# Read the default settings either from the previously-entered options, or from the default file
-	if (file_exists('./step_3.ini'))
-		$defaults = parse_ini_file('./step_3.ini');
-	else
-		$defaults = update_auto_defaults(parse_ini_file('./defaults.ini'));
+	if (file_exists('step_3.ini')) {
+		$defaults = parse_ini_file('step_3.ini');
+	} else {
+		$defaults = parse_ini_file('defaults.ini');
+		update_auto_defaults($defaults);
+	}
 ?>
 <html>
 	<head>

@@ -78,12 +78,15 @@ function checkForSLAMTables( $pdo )
 
 function checkUserPermissions($pdo)
 {
+	/* TODO: this is still hacky and mysql version dependent. */
+
+	/* 
 	try{
 		$result = $pdo->query("SHOW GRANTS FOR CURRENT_USER;")->fetchAll()[0];
 	}catch (PDOException $e){
 		return false;
 	}
-	
+
 	if (stripos($result, 'SELECT') === false)
 		return false;	
 	if (stripos($result, 'INSERT') === false)
@@ -92,7 +95,7 @@ function checkUserPermissions($pdo)
 		return false;	
 	if (stripos($result, 'DELETE') === false)
 		return false;	
-	
+	*/
 	return true;
 }
 

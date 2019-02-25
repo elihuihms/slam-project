@@ -6,7 +6,7 @@
 error_log
 
 # SLAM-specified config files
-configuration.ini
+configuration*.ini
 preferences.ini
 install/step_?.ini
 
