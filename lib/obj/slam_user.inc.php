@@ -68,7 +68,7 @@ class SLAMuser
 		}
 		elseif(array_key_exists("slam_".$config->values['lab_prefix'],$_COOKIE)) /* does the user possess an auth cookie? */
 		{
-			$crypt = sql_real_escape(urldecode($_COOKIE["slam_{$config->values['lab_prefix']}"]),$db->link);
+			$crypt = $db->Quote(urldecode($_COOKIE["slam_{$config->values['lab_prefix']}"]));
 			$auth = $db->GetRecords("SELECT * FROM `{$config->values['user_table']}` WHERE `crypt`='$crypt' LIMIT 1");
 			
 			if ($auth === false) //GetRecords returns false on error
@@ -156,7 +156,7 @@ class SLAMuser
 	
 	function savePrefs(&$config,$db)
 	{
-		$prefs = sql_real_escape(serialize($this->prefs),$db->link);
+		$prefs = $db->Quote(serialize($this->prefs));
 		$q = "UPDATE `{$config->values['user_table']}` SET `prefs`='$prefs' WHERE `username`='$this->username' LIMIT 1";		
 		if (!$db->Query($q))
 		{

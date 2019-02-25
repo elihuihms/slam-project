@@ -54,6 +54,23 @@ class SLAMdb
 		
 		return true;
 	}
+
+	public function Quote($a)
+	{
+		/*
+			recursively quote an array or a string
+		*/
+	
+		if (!is_array($a)) {
+			return substr($this->link->quote($a), 1, -1);
+		}
+		
+		foreach($a as $k => $v) {
+			$a[$k] = (is_array($v)) ? $this->Quote($v) : substr($this->link->quote($v), 1, -1);
+		}
+		
+		return $a;
+	}
 	
 	private	function loadCategories(&$config)
 	{

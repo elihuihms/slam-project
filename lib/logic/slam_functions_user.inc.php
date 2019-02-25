@@ -127,8 +127,8 @@ function SLAM_dropAssetTags($config,$db,&$user,$request)
 
 function SLAM_changeUserPassword(&$config,$db,$username,$newpass)
 {
-	$username = sql_real_escape($username,$db->link);
-	$salt = makeRandomAlpha(8);
+	$username = $db->Quote($username);
+	$salt = bin2hex(openssl_random_pseudo_bytes(8));
 	$crypt = sha1($salt.$newpass);
 
 	/* attempt to update the salt and crypt */
@@ -163,7 +163,7 @@ function SLAM_saveUserPassword(&$config,$db,$user)
 
 function SLAM_sendUserResetMail(&$config,$db)
 {
-	$email = sql_real_escape($_REQUEST['user_email'],$db->link);
+	$email = $db->Quote($_REQUEST['user_email']);
 
 	$auth = $db->GetRecords("SELECT * FROM `{$config->values['user_table']}` WHERE `email`='$email'");
 	
@@ -183,12 +183,12 @@ function SLAM_sendUserResetMail(&$config,$db)
 	foreach($auth as $user)
 	{
 		/* make the secret key the user will use to reset his/her password */
-		$secret = makeRandomAlpha(10);
+		$secret = bin2hex(openssl_random_pseudo_bytes(10));
 	
 		/* save the secret to the user */
 		$prefs = unserialize($user['prefs']);
 		$prefs['reset_secret'] = $secret;
-		$prefs = sql_real_escape(serialize($prefs),$db->link);
+		$prefs = $db->Quote(serialize($prefs));
 	
 		/* attempt to save the secret back to the user */
 		$result = $db->Query("UPDATE `{$config->values['user_table']}` SET `prefs`='$prefs' WHERE `username`='{$user['username']}' LIMIT 1");
@@ -222,8 +222,8 @@ function SLAM_saveUserResetPass(&$config,$db)
 	if (empty($_REQUEST['user_name']) || empty($_REQUEST['new_password']))
 		return false;
 
-	$username = sql_real_escape($_REQUEST['user_name'],$db->link);		
-	$password = sql_real_escape($_REQUEST['new_password'],$db->link);
+	$username = $db->Quote($_REQUEST['user_name']);		
+	$password = $db->Quote($_REQUEST['new_password']);
 	$secret = $_REQUEST['secret'];
 	
 	$auth = $db->GetRecords("SELECT * FROM `{$config->values['user_table']}` WHERE `username`='$username' LIMIT 1");
@@ -250,7 +250,7 @@ function SLAM_saveUserResetPass(&$config,$db)
 		
 	/* remove the secret key from the user's prefs */
 	unset($prefs['reset_secret']);
-	$prefs = sql_real_escape(serialize($prefs),$db->link);
+	$prefs = $db->Quote(serialize($prefs));
 	
 	$result = $db->Query("UPDATE `{$config->values['user_table']}` SET `prefs`='$prefs' WHERE `username`='$username' LIMIT 1");
 	if ($result === false)
@@ -264,10 +264,10 @@ function SLAM_createNewUser( &$config, $db, $user )
 	if( ! $user->superuser )
 		return "Only superusers can add a new user.";
 	
-	$username	= sql_real_escape($_REQUEST['new_user_name'],$db->link);		
-	$email		= sql_real_escape($_REQUEST['new_user_email'],$db->link);		
-	$password	= sql_real_escape($_REQUEST['new_user_password'],$db->link);
-	$projects	= sql_real_escape($_REQUEST['new_user_projects'],$db->link);		
+	$username	= $db->Quote($_REQUEST['new_user_name']);		
+	$email		= $db->Quote($_REQUEST['new_user_email']);		
+	$password	= $db->Quote($_REQUEST['new_user_password']);
+	$projects	= $db->Quote($_REQUEST['new_user_projects']);		
 	
 	$auth = $db->GetRecords("SELECT * FROM `{$config->values['user_table']}` WHERE `username`='$username' LIMIT 1");
 	if ($auth === false){ //GetRecords returns false on error

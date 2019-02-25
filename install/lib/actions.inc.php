@@ -1,7 +1,5 @@
 <?php
 
-require('../lib/logic/slam_functions.inc.php');
-
 function write_SLAM_options( $filename )
 {
 	#
@@ -191,7 +189,7 @@ function write_SLAM_config( )
 	/* step 4 options */
 		
 	/* make the superuser account */
-	$salt = makeRandomAlpha(8);
+	$salt = bin2hex(openssl_random_pseudo_bytes(8));
 	$crypt = sha1($salt.$options['SLAM_ROOT_PASS_1']);
 	try {
 		SLAM_write_to_table( $pdo, 'SLAM_Researchers', array('username'=>$options['SLAM_ROOT_NAME'],'email'=>$options['SLAM_ROOT_EMAIL'],'crypt'=>$crypt,'salt'=>$salt,'superuser'=>'1') );
@@ -208,7 +206,7 @@ function write_SLAM_config( )
 			continue;
 			
 		$email = $options['SLAM_EMAILS'][ $index ];
-		$salt = makeRandomAlpha(8);
+		$salt = bin2hex(openssl_random_pseudo_bytes(8));
 		$crypt = sha1($salt.$options['SLAM_PASSWORDS'][$index]);
 		if( is_array($options["SLAM_USER_PROJECTS_{$index}"]) )
 			$projects = implode(',',$options["SLAM_USER_PROJECTS_{$index}"]);
@@ -249,7 +247,7 @@ function write_SLAM_config( )
 	return true;
 }
 
-function update_auto_defaults($defaults) {
+function update_auto_defaults(&$defaults) {
 	/*
 		Appropriately sets any 'auto' values in default.ini values
 	*/
@@ -263,8 +261,9 @@ function update_auto_defaults($defaults) {
 		$defaults['SLAM_DB_PASS'] = $_SERVER['RDS_PASSWORD'];
 	}
 	
-	if ($defaults['SLAM_CONF_PATH'] == 'auto')
+	if ($defaults['SLAM_CONF_PATH'] == 'auto'){
 		$defaults['SLAM_CONF_PATH'] = str_replace(DIRECTORY_SEPARATOR.'install','',dirname(realpath($_SERVER['SCRIPT_FILENAME'])));
+	}
 		
 	if ($defaults['SLAM_CONF_HEADER'] == 'auto')
 		$defaults['SLAM_CONF_HEADER'] = 'From: SLAM <'.$_SERVER['SERVER_ADMIN'].'>';
@@ -274,7 +273,6 @@ function update_auto_defaults($defaults) {
 	if ($defaults['SLAM_FILE_TEMP_DIR'] == 'auto')
 		$defaults['SLAM_FILE_TEMP_DIR'] = str_replace(DIRECTORY_SEPARATOR.'install',DIRECTORY_SEPARATOR.'slam_files'.DIRECTORY_SEPARATOR.'temp',dirname(realpath($_SERVER['SCRIPT_FILENAME'])));
 
-	return $defaults;
 }
 
 ?>

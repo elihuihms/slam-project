@@ -76,9 +76,9 @@ class SLAMresult
 			
 			/* convert identifiers to numeric sort */
 			if($request->order['field'] == 'Identifier')
-				$order = 'CAST(SUBSTR(`Identifier`,6) AS SIGNED) '.sql_real_escape($request->order['direction'],$db->link);
+				$order = 'CAST(SUBSTR(`Identifier`,6) AS SIGNED) '.$db->Quote($request->order['direction']);
 			else
-				$order = "`".sql_real_escape($request->order['field'],$db->link)."` ".sql_real_escape($request->order['direction'],$db->link);
+				$order = "`".$db->Quote($request->order['field'])."` ".$db->Quote($request->order['direction']);
 			
 			/* retrieve assets from the table */
 			if(empty($identifiers) || ($request->action == 'save'))

@@ -113,7 +113,7 @@ function SLAM_updateArchiveFileList(&$config,$db,$category,$identifier)
 		return;
 		
 	/* slam together all the files for the records, separated by newlines */
-	$s = sql_real_escape(implode("\n",array_keys($files)),$db->link);
+	$s = $db->Quote(implode("\n",array_keys($files)));
 
 	$q = "UPDATE `$category` SET `Files`='$s' WHERE (`Identifier`='$identifier') LIMIT 1";
 	if (($result = $db->Query($q)) === false)
