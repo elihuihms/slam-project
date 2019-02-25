@@ -140,11 +140,11 @@ function write_SLAM_config( )
 	$options['SLAM_FILE_ARCH_DIR'] = rtrim($options['SLAM_FILE_ARCH_DIR'],DIRECTORY_SEPARATOR);
 	$options['SLAM_FILE_TEMP_DIR'] = rtrim($options['SLAM_FILE_TEMP_DIR'],DIRECTORY_SEPARATOR);
 	
-	if( !file_exists($options['SLAM_FILE_ARCH_DIR']) )
+	if( !is_dir($options['SLAM_FILE_ARCH_DIR']) )
 		if( !mkdir($options['SLAM_FILE_ARCH_DIR']) )
 			return( array("Could not create {$options['SLAM_FILE_ARCH_DIR']}."));
 			
-	if( !file_exists($options['SLAM_FILE_TEMP_DIR']) )
+	if( !is_dir($options['SLAM_FILE_TEMP_DIR']) )
 		if( !mkdir($options['SLAM_FILE_TEMP_DIR']) )
 			return( array("Could not create {$options['SLAM_FILE_TEMP_DIR']}."));
 			

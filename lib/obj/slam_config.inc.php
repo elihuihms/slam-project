@@ -43,9 +43,14 @@ class SLAMconfig
 		}
 		
 		/* check for some absolutely required values in the config file */
-		
 		if(!is_dir($this->values['path']))
 			exit("The installation path specified in your configuration file (\"{$this->values['path']}\") is not valid. Please check your \"configuration.ini\" file or contact your system administrator.");
+
+		if(!is_dir($this->values['file manager']['archive_dir']) || !is_writable($this->values['file manager']['archive_dir']))
+			exit("The file archive path specified in your configuration file (\"{$this->values['file manager']['archive_dir']}\") does not exist or is not writeable. Please check your \"configuration.ini\" file or contact your system administrator.");
+
+		if(!is_dir($this->values['file manager']['temp_dir']) || !is_writable($this->values['file manager']['temp_dir']))
+			exit("The file archive path specified in your configuration file (\"{$this->values['file manager']['temp_dir']}\") does not exist or is not writeable. Please check your \"configuration.ini\" file or contact your system administrator.");
 		
 		if(empty($this->values['category_table']))
 			exit("The \"category_table\" option in the \"configuration.ini\" file is missing. Please check your configuration file or contact your system administrator.");

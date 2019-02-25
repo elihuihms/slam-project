@@ -22,7 +22,7 @@ function SLAM_makeBreadcrumbHTML($config,$db,$user,$request,$results)
 		$s.=" &raquo; <a href='".$request->makeRequestURL($config,array(),true)."'>Search</a>";
 	else
 	{
-		if((count($categories) == 1) && (count($request->categories[$categories[0]])==1))
+		if((count($categories) == 1) && (count($results->assets[$categories[0]])==1))
 			$s.=" &raquo; <a href='".$request->makeRequestURL($config,array(),true)."'>{$results->assets[$categories[0]][0]['Identifier']}</a>";
 		elseif(count($results->assets)>1)
 			$s.=" &raquo; (Multiple Assets)";

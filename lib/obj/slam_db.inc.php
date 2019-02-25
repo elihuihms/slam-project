@@ -14,7 +14,7 @@ class SLAMdb
 
 	public function __construct(&$config)
 	{
-		if( $error = ($this->Connect( $config->values['db_server'],$conf->values['db_port'],$config->values['db_user'],$config->values['db_pass'],$config->values['db_name'],$config->values['db_charset'])) !== true)
+		if( $error = ($this->Connect( $config->values['db_server'],$config->values['db_port'],$config->values['db_user'],$config->values['db_pass'],$config->values['db_name'],$config->values['db_charset'])) !== true)
 			die('Database error: Could not connect: '.$error);
 		
 		if(!($this->tables = $this->GetTables()))
@@ -76,9 +76,10 @@ class SLAMdb
 	{
 		/* retrieve all the category info from the specified category table */
 
-		if(($results = $this->Query("SELECT * FROM {$config->values['category_table']}")) === false)
+		if(($data = $this->Query("SELECT * FROM {$config->values['category_table']}")) === false)
 			die('Fatal error: could not retrieve category information. Please contact your system administrator: '.$this->ErrorState());
 		
+		$results = $data->fetchAll();
 		if (count($results) < 1)
 			die('Fatal error: Your category database table contains no categories. Please add a category or contact your system administrator.');
 		
@@ -205,7 +206,7 @@ class SLAMdb
 	}
 	
 	public	function Query($q){
-		return $this->link->query($q);;
+		return $this->link->query($q);
 	}
 	
 	public	function Disconnect(){
