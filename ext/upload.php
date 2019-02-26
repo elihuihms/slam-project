@@ -17,8 +17,8 @@ if( !$user->authenticated )
 
 $request	= new SLAMrequest($config,$db,$user);
 $result		= new SLAMresult($config,$db,$user,$request);
-$category	= array_shift(array_keys($request->categories));
-$identifier	= array_shift($request->categories[ $category ]);
+$category	= array_keys($request->categories)[0];
+$identifier	= $request->categories[$category][0];
 $path		= SLAM_getArchivePath($config,$category,$identifier);
 $access		= 0;
 	
@@ -31,7 +31,7 @@ if( array_key_exists('tempfileid',$_REQUEST) )
 }
 elseif( count($result->assets[$category]) == 1 )
 {
-	$asset = array_shift($result->assets[ $category ]);	
+	$asset = $result->assets[$category][0];	
 	$access = SLAM_getAssetAccess($user, $asset);		
 }
 else // possibly a new asset

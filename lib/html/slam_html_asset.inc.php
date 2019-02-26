@@ -16,7 +16,7 @@ function SLAM_makeAssetEditHTML(&$config,$db,$user,$request,&$result)
 	
 	$s="<form id='editRecord' action='{$config->html['url']}' method='POST'>\n";
 	
-	$category	= array_shift(array_keys($request->categories)); //the first category
+	$category	= array_keys($request->categories)[0]; //the first category
 	$assets		= $result->assets[$category];
 	$structure	= $result->fields[$category];
 	$editable	= array();
