@@ -14,6 +14,7 @@ install/step_?.ini
 slam_files
 
 # Elastic Beanstalk Files
+.ebignore
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml

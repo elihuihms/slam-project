@@ -20,11 +20,6 @@ class SLAMconfig
 		$this->values['build'] = '20190127';
 		
 		// do some basic initializing
-		if( array_key_exists('HTTPS',$_SERVER) )
-			$http = ($_SERVER['HTTPS'] == 'on') ? 'https://' : 'http://';
-		else
-			$http = 'http://';
-		$this->html['url'] = $http.dirname($_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME']).'/';
 		$this->html['headers'] = array();
 		$this->html['onload'] = array();
 		$this->html['abort'] = '';
@@ -41,6 +36,12 @@ class SLAMconfig
 			$this->values = array_merge($this->values,$this->parse_config());
 			$this->errors[] = "Note: updated config file to version ".$this->values['version'].".";
 		}
+
+		/* redirect http -> https if necessary */
+		if( $this->check_https() )
+			$this->html['url'] = 'https://'.dirname($_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME']).'/';
+		else
+			$this->html['url'] = 'http://'.dirname($_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME']).'/';
 		
 		/* check for some absolutely required values in the config file */
 		if(!is_dir($this->values['path']))
@@ -56,8 +57,8 @@ class SLAMconfig
 			exit("The \"category_table\" option in the \"configuration.ini\" file is missing. Please check your configuration file or contact your system administrator.");
 
 		if(empty($this->values['user_table']))
-			exit("The \"category_table\" option in the \"configuration.ini\" file is missing. Please check your configuration file or contact your system administrator.");			
-				
+			exit("The \"category_table\" option in the \"configuration.ini\" file is missing. Please check your configuration file or contact your system administrator.");
+
 		return;
 	}
 
@@ -141,6 +142,10 @@ class SLAMconfig
 			$this->update_ini_file( $old_config_arr, 'db_charset = "'.$def_config_ini['SLAM_DB_CHARSET'].'"', 'db_name');
 			$dirty = true;
 		}
+		if (!array_key_exists('force_https', $this->values)) {
+			$this->update_ini_file( $old_config_arr, PHP_EOL.'; force HTTP -> HTTPS redirect if HTTPS is available?'.PHP_EOL.'force_https = false', 'cookie_expire');
+			$dirty = true;
+		}
 		if ($dirty) {
 			if (!$this->update_ini_file( $old_config_arr, 'config_version = "'.$this->values['version'].'"', 'config_version', true))
 				$this->update_ini_file( $old_config_arr, 'config_version = "'.$this->values['version'].'"');
@@ -150,6 +155,30 @@ class SLAMconfig
 			if (file_put_contents('configuration.ini', implode(PHP_EOL, $old_config_arr)) === false)
 				exit("Fatal error: Could not write updates to configuration.ini. Please contact your system administrator.");
 		}
+	}
+
+	private function check_https()
+	{
+		/*
+			forces redirect of http -> https if required and available
+		*/
+
+		if (!$this->values['force_https']) {
+			$this->errors[] = "force_https is not enabled.";
+			return false;
+		} else if (!extension_loaded('openssl')) {
+			if ($this->values['DEBUG'] != 'true') {
+				exit("Fatal error: force_https is enabled, but the openssl extension is not loaded.");
+			} else {
+				$this->errors[] = "force_https is enabled, but the openssl extension is not loaded.";
+				return false;
+			}
+		} else if (!(isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on' || $_SERVER['HTTPS'] == 1) || isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) {
+			header('HTTP/1.1 301 Moved Permanently');
+			header('Location: ' . 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
+			exit();
+		}
+		return true;
 	}
 }
 

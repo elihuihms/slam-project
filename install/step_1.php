@@ -1,4 +1,8 @@
 <?php
+	if (file_exists(dirname(__DIR__).DIRECTORY_SEPARATOR.'configuration.ini')) {
+		die("Installation complete. Go <a href='../index.php'>here</a> to access it.");
+	}
+
 	require('lib/constants.inc.php');
 	require('lib/actions.inc.php');
 			
