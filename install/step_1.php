@@ -17,13 +17,13 @@
 ?>
 <html>
 	<head>
-		<title>SLAM installer - Step 1/4</title>
+		<title>SLAM installer - Step 1/5</title>
 		<link type='text/css' href='css/install.css' rel='stylesheet' />
 		<script type='text/javascript' src='js/check.js'></script>
 		<script type='text/javascript' src='js/validate.js'></script>
 	</head>
 	<body><div id='container'>
-		<div id='installerTitle'><span style='font-family:Impact'>SLAM</span> installer - Step 1/4</div>
+		<div id='installerTitle'><span style='font-family:Impact'>SLAM</span> installer - Step 1/5</div>
 		<div id='installerVer'>Version: <?php print($slam_version) ?></div>
 		
 		<form name='forward' action='step_2.php'  method='post'>
