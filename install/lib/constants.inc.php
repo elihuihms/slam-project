@@ -13,5 +13,7 @@
 		PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_BOTH,
 		PDO::ATTR_EMULATE_PREPARES => false,
 	];
-	
+
+	$adminer_web_url = 'https://www.adminer.org/#download';
+	$adminer_latest_url = 'https://www.adminer.org/latest-mysql-en.php';
 ?>

@@ -5,6 +5,10 @@ $config	= new SLAMconfig();
 $db		= new SLAMdb($config);
 $user = new SLAMuser($config,$db);
 
+if (!file_exists($config->values['adminer_path'])){
+	die("Adminer is not installed.");
+}
+
 if(!$_GET['db']){ /* keep Adminer focused on the appropriate db */
 	$_GET['db'] = urlencode($config->values['db_name']);
 }
@@ -46,5 +50,5 @@ function adminer_object() {
 	return new AdminerSoftware;
 }
 
-include "./lib/adminer-4.7.0-mysql.php";
+include $config->values['adminer_path'];
 ?>

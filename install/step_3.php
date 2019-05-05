@@ -9,9 +9,11 @@
 	$fail = array();
 	
 	# save the previous page settings
-	if ($_REQUEST['STEP'] == 2)
-		if( ($ret = write_SLAM_options( './step_2.ini' )) != true )
+	if ($_REQUEST['STEP'] == 2) {
+		if( ($ret = write_SLAM_options( './step_2.ini' )) != true ) {
 			$fail[] = "Could not save your progress. Please contact your system administrator: $ret";
+		}
+	}
 	
 	# Read the default settings either from the previously-entered options, or from the default file
 	if (file_exists('step_3.ini')) {
@@ -23,7 +25,7 @@
 ?>
 <html>
 	<head>
-		<title>SLAM installer - Step 3/4</title>
+		<title>SLAM installer - Step 3/5</title>
 		<link type='text/css' href='css/install.css' rel='stylesheet' />
 		<script type='text/javascript' src='js/check.js'></script>
 		<script type='text/javascript' src='js/clone.js'></script>
@@ -33,11 +35,12 @@
 		<script type='text/javascript'>
 			document.cloneTRcounter=<?php echo count($defaults['SLAM_PROJECT_NAME']) ?>;
 		</script>
-		<div id='installerTitle'><span style='font-family:Impact'>SLAM</span> installer - Step 3/4</div>
+		<div id='installerTitle'><span style='font-family:Impact'>SLAM</span> installer - Step 3/5</div>
 		<div id='installerVer'>Version: <?php print($slam_version) ?></div>
 <?php
-	foreach( $fail as $text )
+	foreach( $fail as $text ) {
 		print "<div class='fatalFail'>$text</div>\n";
+	}
 ?>		
 		<form name='forward' action='step_4.php' method='post'>
 			<input type='hidden' name='STEP' value='3' />
