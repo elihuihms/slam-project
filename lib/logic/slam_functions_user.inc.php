@@ -128,7 +128,7 @@ function SLAM_dropAssetTags($config,$db,&$user,$request)
 function SLAM_changeUserPassword(&$config,$db,$username,$newpass)
 {
 	$username = $db->Quote($username);
-	$salt = bin2hex(openssl_random_pseudo_bytes(8));
+	$salt = substr(str_shuffle(MD5(microtime())), 0, 8);
 	$crypt = sha1($salt.$newpass);
 
 	/* attempt to update the salt and crypt */
@@ -183,7 +183,7 @@ function SLAM_sendUserResetMail(&$config,$db)
 	foreach($auth as $user)
 	{
 		/* make the secret key the user will use to reset his/her password */
-		$secret = bin2hex(openssl_random_pseudo_bytes(10));
+		$secret = substr(str_shuffle(MD5(microtime())), 0, 10);
 	
 		/* save the secret to the user */
 		$prefs = unserialize($user['prefs']);
@@ -193,7 +193,7 @@ function SLAM_sendUserResetMail(&$config,$db)
 		/* attempt to save the secret back to the user */
 		$result = $db->Query("UPDATE `{$config->values['user_table']}` SET `prefs`='$prefs' WHERE `username`='{$user['username']}' LIMIT 1");
 		if ($result === false){
-			$config->errors[] = 'Database error:  Could not send reset email, could not update user table:'.$db->ErrorState();
+			$config->errors[] = 'Database error: Could not send reset email, could not update user table:'.$db->ErrorState();
 			return;
 		}
 	

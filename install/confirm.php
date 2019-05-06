@@ -10,7 +10,6 @@
 
 	$fail = array();
 
-	# is adminer installed?
 	# Read the default settings either from the previously-entered options, or from the default file
 	if (file_exists('step_1.ini')) {
 		$defaults = parse_ini_file('step_1.ini');
@@ -18,6 +17,8 @@
 		$defaults = parse_ini_file('defaults.ini');
 		update_auto_defaults($defaults);
 	}
+
+	# is adminer installed?
 	$adminer_path = $defaults['SLAM_CONF_PATH'].DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR.'adminer.php';
 
 	# are there any errors?

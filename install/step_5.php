@@ -23,7 +23,7 @@
 
 	# save the previous page settings
 	if ($_REQUEST['STEP'] == 4) {
-		if( write_SLAM_options( './step_4.ini' ) === false ) {
+		if( $ret = write_SLAM_options( './step_4.ini' ) === false ) {
 			$fail[] = "Could not save your progress. Please contact your system administrator: $ret";
 		}
 	
@@ -104,24 +104,20 @@
 						The free and easy-to-use database editor <a href="https://www.adminer.org/">Adminer</a> is recommended for use with SLAM, and can be installed below.</td>
 					</td>
 				</tr>
-			</table>
 <?php
 if (file_exists($adminer_path)) {
 	echo <<<EOL
-			<table id='successTable'>
 				<tr>
 					<td class='categoryInfo' colspan="2">Adminer has been installed successfully.</td>
-					<br />
-					<br />
 				</tr>
 			</table>
 EOL;
 } elseif (!$adminer_error) {
 	echo <<<EOL
-			<form name='installForm' action='step_5.php' method='post'>
+			<form name='adminerInstallForm' action='step_5.php' method='post'>
 				<input type='hidden' name='STEP' value='5' />
 				<input type='hidden' name='TYPE' value='auto' />
-				<table id='installTable'>
+				<table id='adminerInstallTable'>
 					<tr>
 						<td class='inputCategory' colspan='2'>Automatic Installation</td>
 					</tr>
@@ -138,10 +134,10 @@ EOL;
 EOL;
 } else {
 	echo <<<EOL
-			<form name='installForm' action='step_5.php' method='post' enctype="multipart/form-data">
+			<form name='adminerInstallForm' action='step_5.php' method='post' enctype="multipart/form-data">
 				<input type='hidden' name='STEP' value='5' />
 				<input type='hidden' name='TYPE' value='manual' />
-				<table id='installTable'>
+				<table id='adminerInstallTable'>
 					<tr>
 						<td class='inputCategory' colspan='2'>Manual Installation</td>
 					</tr>

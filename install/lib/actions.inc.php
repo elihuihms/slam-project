@@ -189,7 +189,7 @@ function write_SLAM_config( )
 	/* step 4 options */
 		
 	/* make the superuser account */
-	$salt = bin2hex(openssl_random_pseudo_bytes(8));
+	$salt = substr(str_shuffle(MD5(microtime())), 0, 8);
 	$crypt = sha1($salt.$options['SLAM_ROOT_PASS_1']);
 	try {
 		SLAM_write_to_table( $pdo, 'SLAM_Researchers', array('username'=>$options['SLAM_ROOT_NAME'],'email'=>$options['SLAM_ROOT_EMAIL'],'crypt'=>$crypt,'salt'=>$salt,'superuser'=>'1') );
@@ -206,7 +206,7 @@ function write_SLAM_config( )
 			continue;
 			
 		$email = $options['SLAM_EMAILS'][ $index ];
-		$salt = bin2hex(openssl_random_pseudo_bytes(8));
+		$salt = substr(str_shuffle(MD5(microtime())), 0, 8);
 		$crypt = sha1($salt.$options['SLAM_PASSWORDS'][$index]);
 		if( is_array($options["SLAM_USER_PROJECTS_{$index}"]) )
 			$projects = implode(',',$options["SLAM_USER_PROJECTS_{$index}"]);
