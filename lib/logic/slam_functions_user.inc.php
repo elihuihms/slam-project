@@ -33,7 +33,14 @@ function SLAM_doUserAction(&$config,$db,&$user)
 			SLAM_saveUserResetPass($config,$db);
 			
 			return;
+		case 'show_tools':
+			$config->html['onload'][] = "showPopupDiv(\"pub/user_tools.php\",\"userActionPopup\",{})";
+
+			return;
+		case 'tool_action':
+			SLAM_userToolAction($config,$db,$user);
 			
+			return;
 		case 'create_user':
 			if( ($msg = SLAM_createNewUser($config,$db,$user)) !== true)
 				$config->html['onload'][] = 'showPopupDiv("pub/user_create.php?error=true&error_text='.rawurlencode($msg).'","userActionPopup",{})';
@@ -41,6 +48,47 @@ function SLAM_doUserAction(&$config,$db,&$user)
 				return;
 		default:
 			return;
+	}
+
+	return;
+}
+
+function SLAM_userToolAction(&$config,$db,$user){
+
+	/* $user is the currently logged in user */
+	if (!$user->superuser) {
+		$config->errors[] = "User is not administrator";
+		return;
+	}
+
+	if ($_REQUEST['tool_action'] == "reset") {
+		
+		$username = $db->Quote($_REQUEST['user_username']);
+		$reset_user = new SLAMuser($config,$db,$username,''); /* will fail login, but user->prefs will still be loaded */
+
+		if (!array_key_exists('failed_logins', $reset_user->prefs)) {
+			$config->errors[] = "User cannot be reset.";
+		} else {
+			$reset_user->prefs['failed_logins'] = 0;
+			$reset_user->savePrefs($config,$db);
+			SLAM_sendUserResetMail($config,$db);
+		}
+	} elseif ($_REQUEST['tool_action'] == "disable") {
+		
+		$username = $db->Quote($_REQUEST['user_username']);
+
+		if ($username == $user->username) {
+			$config->errors[] = "User cannot disable themselves.";
+		} else {
+			$result = $db->Query("UPDATE `{$config->values['user_table']}` SET `crypt`='' WHERE `username`='$disable_username' LIMIT 1");
+			if ($result === false) {
+				$config->errors[] = 'Database error: Could not disable user, could not access user table:'.$db->ErrorState();
+			} elseif ($result->rowCount() == 0) {
+				$config->errors[] = 'Database error: Could not disable user, invalid username provided.';
+			}
+		}
+	} else {
+		$config->errors[] = "Unrecognized tool action";
 	}
 
 	return;
@@ -133,13 +181,11 @@ function SLAM_changeUserPassword(&$config,$db,$username,$newpass)
 
 	/* attempt to update the salt and crypt */
 	$auth = $db->Query("UPDATE `{$config->values['user_table']}` SET `salt`='$salt',`crypt`='$crypt' WHERE `username`='$username' LIMIT 1");
-	if ($auth === false)
-	{
+	
+	if ($auth === false) {
 		$config->errors[] = 'Database error: Could not update password, could not access user table:'.$db->ErrorState();
 		return false;
-	}
-	elseif (count($auth) < 1)
-	{
+	} elseif ($auth->rowCount() == 0) {
 		$config->errors[] = 'Database error: Could not update password, invalid username provided.';
 		return false;
 	}
@@ -163,25 +209,27 @@ function SLAM_saveUserPassword(&$config,$db,$user)
 
 function SLAM_sendUserResetMail(&$config,$db)
 {
-	$email = $db->Quote($_REQUEST['user_email']);
-
-	$auth = $db->GetRecords("SELECT * FROM `{$config->values['user_table']}` WHERE `email`='$email'");
+	if (array_key_exists('user_email', $_REQUEST)) {
+		$email = $db->Quote($_REQUEST['user_email']);
+		$auth = $db->GetRecords("SELECT * FROM `{$config->values['user_table']}` WHERE `email`='$email'");
+	} elseif (array_key_exists('user_username', $_REQUEST)) {
+		$username = $db->Quote($_REQUEST['user_username']);
+		$auth = $db->GetRecords("SELECT * FROM `{$config->values['user_table']}` WHERE `username`='$username'");
+	} else {
+		$auth = array();
+	}
 	
 	//GetRecords returns false on error
-	if ($auth === false)
-	{
+	if ($auth === false) {
 		$config->errors[] = 'Database error: Could not send reset email, could not access user table:'.$db->ErrorState();
 		return;
-	}
-	elseif (count($auth) < 1)
-	{
-		$config->errors[] = 'Could not send reset email, address is not valid.';
+	} elseif (count($auth) < 1) {
+		$config->errors[] = 'Could not send reset email, search key is not valid.';
 		return;
 	}
 	
 	$reset_urls = '';
-	foreach($auth as $user)
-	{
+	foreach($auth as $user) {
 		/* make the secret key the user will use to reset his/her password */
 		$secret = substr(str_shuffle(MD5(microtime())), 0, 10);
 	
@@ -192,26 +240,29 @@ function SLAM_sendUserResetMail(&$config,$db)
 	
 		/* attempt to save the secret back to the user */
 		$result = $db->Query("UPDATE `{$config->values['user_table']}` SET `prefs`='$prefs' WHERE `username`='{$user['username']}' LIMIT 1");
-		if ($result === false){
+		
+		if ($result === false) {
 			$config->errors[] = 'Database error: Could not send reset email, could not update user table:'.$db->ErrorState();
+			return;
+		} elseif ($result->rowCount() == 0) {
+			$config->errors[] = 'Could not send reset email, username is not valid.';
 			return;
 		}
 	
-		$referrer = explode('?',$_SERVER[HTTP_REFERER]);
+		$referrer = explode('?',$_SERVER['HTTP_REFERER']);
 		$reset_urls.= "For the account: \"{$user['username']}\":\n";
 		$reset_urls.= $referrer[0]."?action=user&user_action=reset_change&user_name=".urlencode($user['username'])."&secret=$secret\n\n";
 	}
 	
 	$message = <<<EOL
-Someone from the IP address {$_SERVER[REMOTE_ADDR]} has requested that your account password be reset.
+Someone from the IP address {$_SERVER['REMOTE_ADDR']} has requested that your account password be reset.
 If you did not request this, you can safely ignore this message.
 
 If you would like to reset your password, please click or copy/paste this address into your browser:
 
-$reset_urls
 EOL;
 
-	if (mail($email,'SLAM Password reset',wordwrap($message,70).$url,$config->values['mail_header']) !== true)
+	if (mail($email,'SLAM Password reset',wordwrap($message,70).$reset_urls,$config->values['mail_header']) !== true)
 		$config->errors[]='Could not send password reset email.';
 		
 	return;
@@ -253,8 +304,9 @@ function SLAM_saveUserResetPass(&$config,$db)
 	$prefs = $db->Quote(serialize($prefs));
 	
 	$result = $db->Query("UPDATE `{$config->values['user_table']}` SET `prefs`='$prefs' WHERE `username`='$username' LIMIT 1");
-	if ($result === false)
+	if ($result === false) {
 		$config->errors[] = 'Database error:  Could not remove secret key from user record:'.$db->ErrorState();
+	}
 	
 	return;
 }
@@ -279,8 +331,7 @@ function SLAM_createNewUser( &$config, $db, $user )
 	}
 	
 	$result = $db->Query("INSERT INTO `{$config->values['user_table']}` (`username`,`email`,`projects`) VALUES ('$username','$email','$projects')");
-	if( $result === false)
-	{
+	if( $result === false) {
 		$config->errors[] = 'Database error:  Could not create the new user:'.$db->ErrorState();
 		return "Could not create the user.";
 	}

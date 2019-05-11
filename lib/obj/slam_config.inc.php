@@ -17,7 +17,7 @@ class SLAMconfig
 		$this->errors = array();
 		
 		$this->values['version'] = '1.2';
-		$this->values['build'] = '20190127';
+		$this->values['build'] = '20190511';
 		
 		// do some basic initializing
 		$this->html['headers'] = array();

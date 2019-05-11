@@ -4,7 +4,8 @@ class SLAMdb
 {
 	public $link = null;
 	public $tables = array();
-	
+
+	private $config;
 	private $required_fields = array('Serial','Identifier','Removed');
 	private $pdo_options = [
 		PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
@@ -14,6 +15,8 @@ class SLAMdb
 
 	public function __construct(&$config)
 	{
+		$this->config = $config;
+
 		if( $error = ($this->Connect( $config->values['db_server'],$config->values['db_port'],$config->values['db_user'],$config->values['db_pass'],$config->values['db_name'],$config->values['db_charset'])) !== true)
 			die('Database error: Could not connect: '.$error);
 		
@@ -206,7 +209,13 @@ class SLAMdb
 	}
 	
 	public	function Query($q){
-		return $this->link->query($q);
+		try {
+			$response = $this->link->query($q);
+		} catch (PDOException $e) {
+			$this->config->errors[] = $e->getMessage();
+			return false;
+		}
+		return $response;
 	}
 	
 	public	function Disconnect(){
