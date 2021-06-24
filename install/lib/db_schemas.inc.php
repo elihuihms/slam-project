@@ -16,7 +16,7 @@ $sql_create_required['researchers']['sql']="CREATE TABLE IF NOT EXISTS `SLAM_Res
 	`email` varchar( 255 ) NOT NULL,
 	`superuser` tinyint( 4 ) NOT NULL DEFAULT '0',
 	`projects` varchar( 255 ) NOT NULL DEFAULT '',
-	`prefs` text NOT NULL,
+	`prefs` text,
 	PRIMARY KEY ( `username` )
 ) ENGINE = MyISAM DEFAULT CHARSET = latin1;
 ";
@@ -26,7 +26,7 @@ $sql_create_required['categories']['sql']="CREATE TABLE IF NOT EXISTS `SLAM_Cate
   `Name` varchar(255) NOT NULL,
   `Prefix` varchar(2) NOT NULL,
   `List Fields` varchar(255) NOT NULL DEFAULT 'Identifier,Researcher,Date,Files',
-  `Field Order` text NOT NULL,
+  `Field Order` text,
   `Title Field` varchar(255) NOT NULL DEFAULT 'Identifier',
   `Owner Field` varchar(255) NOT NULL DEFAULT 'Researcher',
   `Date Field` varchar(255) NOT NULL DEFAULT 'Date',
