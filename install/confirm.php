@@ -1,16 +1,25 @@
 <?php
+	if (file_exists(dirname(__DIR__).DIRECTORY_SEPARATOR.'configuration.ini')) {
+		die("Installation complete. Go <a href='../index.php'>here</a> to access it.");
+	}
+
 	require('lib/constants.inc.php');
-	
+	require('lib/actions.inc.php');
 	require('lib/db_actions.inc.php');
 	require('lib/file_actions.inc.php');
-	require('lib/actions.inc.php');
 
 	$fail = array();
-	
-	# save the previous page settings
-	if ($_REQUEST['STEP'] == 4)
-		if( write_SLAM_options( './step_4.ini' ) === false )
-			$fail[] = "Could not save your progress. Please contact your system administrator: $ret";
+
+	# Read the default settings either from the previously-entered options, or from the default file
+	if (file_exists('step_1.ini')) {
+		$defaults = parse_ini_file('step_1.ini');
+	} else {
+		$defaults = parse_ini_file('defaults.ini');
+		update_auto_defaults($defaults);
+	}
+
+	# is adminer installed?
+	$adminer_path = $defaults['SLAM_CONF_PATH'].DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR.'adminer.php';
 
 	# are there any errors?
 	$errors = check_SLAM_options();
@@ -24,12 +33,13 @@
 		<div id='installerTitle'><span style='font-family:Impact'>SLAM</span> installer - Confirm</div>
 		<div id='installerVer'>Version: <?php print($slam_version) ?></div>
 <?php
-	foreach( $fail as $text )
+	foreach( $fail as $text ) {
 		print "<div class='fatalFail'>$text</div>\n";	
+	}
 ?>
 		<table id='configTable'>
 			<tr>
-				<td class='helpHeader' colspan="2">For assistance, please refer to the SLAM documentation [<a href='http://steelsnowflake.com/SLAM' target='_new'>here</a>].</td>
+				<td class='helpHeader' colspan="2">For assistance, please refer to the SLAM documentation [<a href='http://steelsnowflake.com/projects/SLAM' target='_new'>here</a>].</td>
 			</tr>
 <?php
 if( count($errors) == 0 )
@@ -61,7 +71,6 @@ else
 					 <td class='categoryInfo' colspan="2">The installer has detected some problems:</td>
 			</tr>
 EOL;
-
 	foreach( $errors as $where=>$text )
 	{
 		echo<<<EOL
@@ -71,15 +80,22 @@ EOL;
 			</tr>
 EOL;
 	}
+	if( !file_exists($adminer_path) ){
+		echo<<<EOL
+			<tr>
+				<td class='inputField'><b>Step 5 :</b></td>
+				<td class='inputValue'>Adminer not installed.</td>
+			</tr>
+EOL;
+	}
 	if( count($errors) > 0)
 	{
 		echo <<<EOL
 			<tr>
-					<td class='inputCategory' colspan='2'>Review Steps:</td>
+				<td class='inputCategory' colspan='2'>Review Steps:</td>
 			</tr>
 EOL;
 	}
-		
 }
 ?>
 			<tr>
@@ -108,6 +124,14 @@ EOL;
 					<form name='step_4' action='step_4.php'  method='post'>
 						<input type='submit' class='submitButton' value='Review Step 4 Options' />
 					</form>
+				</td>
+			</tr>
+			<tr>
+				<td class='confirmButtons' colspan='2'>
+					<form name='step_5' action='step_5.php'  method='post'>
+						<input type='submit' class='submitButton' value='Review Step 5 Options' />
+					</form>
+					<br />
 					<br />
 				</td>
 			</tr>

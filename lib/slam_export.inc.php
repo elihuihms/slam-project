@@ -11,7 +11,6 @@ require('obj/slam_request.inc.php');
 require('obj/slam_result.inc.php');
 
 /* function includes */
-require('logic/slam_functions.inc.php');
 require('logic/slam_functions_db.inc.php');
 require('logic/slam_functions_user.inc.php');
 require('logic/slam_functions_asset.inc.php');

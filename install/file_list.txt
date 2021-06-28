@@ -2,7 +2,7 @@
 # Required file list for SLAM
 # Files must start with './'
 #
-# Version 1.x.x
+# Version 1.2
 #
 
 ./.htaccess
@@ -32,6 +32,7 @@
 
 ../.htaccess
 ../index.php
+../admin.php
 
 ../css
 ../css/asset.css
@@ -75,7 +76,6 @@
 ../lib/html/slam_html_user.inc.php
 
 ../lib/logic
-../lib/logic/slam_functions.inc.php
 ../lib/logic/slam_functions_asset.inc.php
 ../lib/logic/slam_functions_dash.inc.php
 ../lib/logic/slam_functions_db.inc.php

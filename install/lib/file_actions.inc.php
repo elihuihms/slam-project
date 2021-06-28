@@ -41,17 +41,8 @@ function checkFileList( $file_list_path )
 
 function checkExecCommand($cmd)
 {
-	/* @TODO@ Make compatible for windows? */
-	if(function_exists('exec'))
-	{
-		$cmd = escapeshellcmd($cmd);
-	    exec("command -v $string >& /dev/null && echo 'Found' || echo 'Not Found'", $output);
-
-	    if( $output[0] == "Found" )
-	        return true;
-	    else
-	        return false;
-	}
+	$test = (false === stripos(PHP_OS, 'win')) ? 'command -v' : 'where';
+	return (null === shell_exec("$test ". escapeshellarg($cmd))) ? false : true;
 }
 
 function checkDirectoryIsRW($path)

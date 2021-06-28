@@ -105,7 +105,7 @@ function SLAM_saveAssetEdits(&$config,$db,&$user,$request)
 			$asset['permissions'] = json_decode(base64_decode($_REQUEST['permissions']));
 		
 		/* are we creating a new entry? */
-		if ( $_REQUEST['new'] )
+		if (array_key_exists('new', $_REQUEST))
 		{
 			if( ($s = insertNewAsset( $config, $db, $user, $category, $asset)) !== True)
 				return $s;
@@ -198,7 +198,7 @@ function replaceExistingAsset( $config, $db, $user, $category, $asset )
 	/* don't try and save the permissions field into the asset table */
 	unset($asset['permissions']);
 	
-	$q = SLAM_makeUpdateStatement( $db, $category, $asset, "`Identifier`='".sql_real_escape($asset['Identifier'],$db->link)."'", 1 );
+	$q = SLAM_makeUpdateStatement( $db, $category, $asset, "`Identifier`='".$db->Quote($asset['Identifier'])."'", 1 );
 
 	if ($db->Query($q) === false)
 		return SLAM_makeErrorHTML('Database error: could not save record: '.$db->ErrorState(),true);

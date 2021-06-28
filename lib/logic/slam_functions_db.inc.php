@@ -2,8 +2,8 @@
 
 function SLAM_makeInsertionStatement( $db, $f, $table, $array )
 {
-	$a = implode("`,`",sql_real_escape(array_keys($array),$db->link));
-	$b = implode("','",sql_real_escape(array_values($array),$db->link));
+	$a = implode("`,`",$db->Quote(array_keys($array)));
+	$b = implode("','",$db->Quote(array_values($array)));
 	return "$f INTO `$table` (`$a`) VALUES ('$b')";
 }
 
@@ -11,7 +11,7 @@ function SLAM_makeUpdateStatement( $db, $table, $array, $where, $limit=False )
 {
 	$a = array();
 	foreach( $array as $k => $v )
-		$a[]="`".sql_real_escape($k,$db->link)."`='".sql_real_escape($v,$db->link)."'";
+		$a[]="`".$db->Quote($k)."`='".$db->Quote($v)."'";
 	$a = implode( ',', $a );
 	
 	$b = ($limit === false) ? '' : "LIMIT $limit";

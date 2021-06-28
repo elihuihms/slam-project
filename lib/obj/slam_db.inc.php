@@ -4,12 +4,20 @@ class SLAMdb
 {
 	public $link = null;
 	public $tables = array();
-	
+
+	private $config;
 	private $required_fields = array('Serial','Identifier','Removed');
-	
+	private $pdo_options = [
+		PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+		PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_BOTH,
+		PDO::ATTR_EMULATE_PREPARES => false,
+	];
+
 	public function __construct(&$config)
 	{
-		if( $error = ($this->Connect($config->values['db_server'],$config->values['db_user'],$config->values['db_pass'],$config->values['db_name'])) !== true)
+		$this->config = $config;
+
+		if( $error = ($this->Connect( $config->values['db_server'],$config->values['db_port'],$config->values['db_user'],$config->values['db_pass'],$config->values['db_name'],$config->values['db_charset'])) !== true)
 			die('Database error: Could not connect: '.$error);
 		
 		if(!($this->tables = $this->GetTables()))
@@ -34,7 +42,7 @@ class SLAMdb
 		$this->loadProjects($config);
 	}
 	
-	public	function Connect($server,$user,$pass,$db)
+	public	function Connect($server,$dbport,$dbuser,$dbpass,$dbname,$charset)
 	{
 		/*
 			attempts to connect to a server and database
@@ -42,21 +50,39 @@ class SLAMdb
 		*/
 		
 		try{
-			$this->link = new PDO("mysql:host=$server;dbname=$db",$user,$pass);
+			$this->link = new PDO("mysql:host={$server};port={$dbport};dbname={$dbname};charset={$charset}",$dbuser,$dbpass,$this->pdo_options);
 		}catch (PDOException $e){
 			return $e;
 		}
 		
 		return true;
 	}
+
+	public function Quote($a)
+	{
+		/*
+			recursively quote an array or a string
+		*/
+	
+		if (!is_array($a)) {
+			return substr($this->link->quote($a), 1, -1);
+		}
+		
+		foreach($a as $k => $v) {
+			$a[$k] = (is_array($v)) ? $this->Quote($v) : substr($this->link->quote($v), 1, -1);
+		}
+		
+		return $a;
+	}
 	
 	private	function loadCategories(&$config)
 	{
 		/* retrieve all the category info from the specified category table */
 
-		if(($results = $this->Query("SELECT * FROM {$config->values['category_table']}")) === false)
+		if(($data = $this->Query("SELECT * FROM {$config->values['category_table']}")) === false)
 			die('Fatal error: could not retrieve category information. Please contact your system administrator: '.$this->ErrorState());
 		
+		$results = $data->fetchAll();
 		if (count($results) < 1)
 			die('Fatal error: Your category database table contains no categories. Please add a category or contact your system administrator.');
 		
@@ -118,7 +144,7 @@ class SLAMdb
 		
 		if(!($results = $this->Query('SHOW TABLES')))
 			return false;
-			
+		
 		$return = array();
 		foreach( $results as $row )
 			$return[] = $row[0];
@@ -183,7 +209,13 @@ class SLAMdb
 	}
 	
 	public	function Query($q){
-		return $this->link->query($q);;
+		try {
+			$response = $this->link->query($q);
+		} catch (PDOException $e) {
+			$this->config->errors[] = $e->getMessage();
+			return false;
+		}
+		return $response;
 	}
 	
 	public	function Disconnect(){

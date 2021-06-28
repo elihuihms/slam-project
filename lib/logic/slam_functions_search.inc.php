@@ -57,14 +57,14 @@ function SLAM_loadSearchResults($config,$db,$user,$request)
 
 		if( in_array($field, $fields) )
 		{
-			$terms[] = '`'.sql_real_escape($field,$db->link).'` '.$allowed_modes[$request->search['mode'][$i]].' \''.sql_real_escape($value,$db->link).'\'';
+			$terms[] = '`'.$db->Quote($field).'` '.$allowed_modes[$request->search['mode'][$i]].' \''.$db->Quote($value).'\'';
 		}
 		elseif( $field == '(Search all)' )
 		{
 			/* build a special term that contains all of the available fields with OR joins */
 			$sub_terms = array();
 			foreach( $fields as $field )
-				$sub_terms[] = '`'.sql_real_escape($field,$db->link).'` '.$allowed_modes[$request->search['mode'][$i]].' \''.sql_real_escape($value,$db->link).'\'';
+				$sub_terms[] = '`'.$db->Quote($field).'` '.$allowed_modes[$request->search['mode'][$i]].' \''.$db->Quote($value).'\'';
 			
 			if( $request->search['mode'][$i] == 'LIKE' )
 				$terms[] = '( '.implode( ' OR ', $sub_terms ).' )';
@@ -92,9 +92,9 @@ function SLAM_loadSearchResults($config,$db,$user,$request)
 		
 		/* convert identifiers to numeric sort */
 		if($request->order['field'] == 'Identifier')
-			$order = 'CAST(SUBSTR(`Identifier`,6) AS SIGNED) '.sql_real_escape($request->order['direction'],$db->link);
+			$order = 'CAST(SUBSTR(`Identifier`,6) AS SIGNED) '.$db->Quote($request->order['direction']);
 		else
-			$order = "`".sql_real_escape($request->order['field'],$db->link)."` ".sql_real_escape($request->order['direction'],$db->link);
+			$order = "`".$db->Quote($request->order['field'])."` ".$db->Quote($request->order['direction']);
 
 		/* construct the select statement by putting together the field names and joining conjunctions */
 		$select = '';

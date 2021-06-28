@@ -8,11 +8,7 @@
 	# make sure we're running a compatible version of PHP
 	if (version_compare(PHP_VERSION, $req_php_version, '<'))
 		$fail[] = "The installed PHP version must be at least $req_php_version, the currently installed version is ".PHP_VERSION;
-	
-	# make sure that safe mode is not enabled
-	if(ini_get('safe_mode'))
-		$fail[] = "SLAM cannot run when PHP's Safe Mode is enabled. Please contact your system administrator.";
-	
+		
 	# make sure we're not installing into an existing install
 	if((!$fail) && (file_exists('../configuration.ini')))
 		$fail[] = "SLAM has already been installed. Click [<a href='../index.php'>here</a>] to access it.";
@@ -33,7 +29,6 @@
 
 	if((!$fail) && (!checkExecCommand('unzip')))
 		$fail[] = "The Unzip utility is not accessible. Please contact your system administrator.";
-
 ?>
 <html>
 	<head>
@@ -62,7 +57,7 @@ Before beginning this installation, please read and agree to the following licen
 <br />
 <br />
 <textarea id='eula'>
-SLAM Copyright (C) 2012 SteelSnowflake LLC
+SLAM Copyright (C) 2021 SteelSnowflake LLC
 
 This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
 

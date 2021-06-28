@@ -1,29 +1,39 @@
 <?php
+	if (file_exists(dirname(__DIR__).DIRECTORY_SEPARATOR.'configuration.ini')) {
+		die("Installation complete. Go <a href='../index.php'>here</a> to access it.");
+	}
+	
 	require('lib/constants.inc.php');
 	require('lib/actions.inc.php');
 	
 	$fail = array();
 	
 	# save the previous page settings
-	if ($_REQUEST['STEP'] == 3)
-		if( ($ret = write_SLAM_options( './step_3.ini' )) != true )
+	if ($_REQUEST['STEP'] == 3) {
+		if( ($ret = write_SLAM_options( './step_3.ini' )) != true ) {
 			$fail[] = "Could not save your progress. Please contact your system administrator: $ret";
+		}
+	}
 
 	# Read the default settings either from the previously-entered options, or from the default file
-	if (file_exists('./step_4.ini'))
-		$defaults = parse_ini_file('./step_4.ini');
-	else
-		$defaults = parse_ini_file('./defaults.ini');
+	if (file_exists('step_4.ini')) {
+		$defaults = parse_ini_file('step_4.ini');
+	} else {
+		$defaults = parse_ini_file('defaults.ini');
+		update_auto_defaults($defaults);
+	}
 	
 	# read the project options too
-	if (file_exists('./step_3.ini'))
-		$projects = parse_ini_file('./step_3.ini');
-	else
-		$projects = parse_ini_file('./defaults.ini');	
+	if (file_exists('step_3.ini')) {
+		$projects = parse_ini_file('step_3.ini');
+	} else {
+		$projects = parse_ini_file('defaults.ini');
+		update_auto_defaults($projects);
+	}
 ?>
 <html>
 	<head>
-		<title>SLAM installer - Step 4/4</title>
+		<title>SLAM installer - Step 4/5</title>
 		<link type='text/css' href='css/install.css' rel='stylesheet' />
 		<script type='text/javascript' src='js/check.js'></script>
 		<script type='text/javascript' src='js/clone.js'></script>
@@ -33,18 +43,19 @@
 		<script type='text/javascript'>
 			document.cloneTRcounter=<?php echo count($defaults['SLAM_USERS'])*3 ?>;
 		</script>
-		<div id='installerTitle'><span style='font-family:Impact'>SLAM</span> installer - Step 4/4</div>
+		<div id='installerTitle'><span style='font-family:Impact'>SLAM</span> installer - Step 4/5</div>
 		<div id='installerVer'>Version: <?php print($slam_version) ?></div>
 <?php
 
-	foreach( $fail as $text )
+	foreach( $fail as $text ) {
 		print "<div class='fatalFail'>$text</div>\n";		
+	}
 ?>		
-		<form name='forward' action='confirm.php' method='post'>
+		<form name='forward' action='step_5.php' method='post'>
 			<input type='hidden' name='STEP' value='4' />
 			<table id='configTable'>
 				<tr>
-					 <td class='helpHeader' colspan="2">For assistance, please refer to the SLAM documentation [<a href='http://steelsnowflake.com/SLAM' target='_new'>here</a>].</td>
+					 <td class='helpHeader' colspan="2">For assistance, please refer to the SLAM documentation [<a href='http://steelsnowflake.com/projects/SLAM/installation' target='_blank'>here</a>].</td>
 				</tr>
 				<tr>
 					<td class='inputCategory' colspan='2'>Administrator setup</td>
@@ -130,7 +141,7 @@
 		</form>
 		<form name='back' action='step_3.php' method='post'>
 			<div class='actionButtons'>
-				<input type='submit' class="submitButton" value='Cancel these settings and Go Back' />
+				<input type='submit' class="submitButton" value='Save these settings and Go Back' />
 			</div>
 		</form>
 	</div></body>

@@ -16,7 +16,7 @@ function SLAM_makeAssetEditHTML(&$config,$db,$user,$request,&$result)
 	
 	$s="<form id='editRecord' action='{$config->html['url']}' method='POST'>\n";
 	
-	$category	= array_shift(array_keys($request->categories)); //the first category
+	$category	= array_keys($request->categories)[0]; //the first category
 	$assets		= $result->assets[$category];
 	$structure	= $result->fields[$category];
 	$editable	= array();
@@ -127,7 +127,7 @@ EOL;
 				/* generate a temporary ID for the asset archive */
 				if (($request->action == 'new') || ($request->action == 'clone'))
 				{
-					$tempfileid = makeRandomAlpha(8);
+					$tempfileid = substr(str_shuffle(MD5(microtime())), 0, 8);
 					$b.=SLAM_makeHiddenInput( $tempfileid ,'tempfileid');	
 					$b.="<tr>\n<td class='assetEditField'>Files :</td><td class='assetEditValue'><input type='button' class='assetFileButton' onClick=\"showFileManager('ext/files.php?i={$fields['Identifier']}&tempfileid=".$tempfileid."'); return false\" value='Attach Files' /></td><td class='assetEditFunction'>&nbsp;</td>\n</tr>\n";
 				}

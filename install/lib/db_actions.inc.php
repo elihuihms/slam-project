@@ -1,13 +1,19 @@
 <?php
 
-function checkDbOptions( $server, $dbname, $dbuser, $dbpass )
+function checkDbOptions( $server, $port, $dbname, $dbuser, $dbpass, $charset )
 {
+	global $pdo_options;
+	
 	$fail = array();
 
 	if ($server == '')
 		$fail[] = "Please specify a database server IP or 'localhost'";
+	if ($port == '')
+		$fail[] = "Please specify a database server port.";
 	if( $dbname == '')
 		$fail[] = "Please specify a database name.";
+	if( $charset == '')
+		$fail[] = "Please specify a database characterset.";
 	if( $dbuser == '')
 		$fail[] = "Please specify a database user.";
 	if( $dbpass == '')
@@ -15,32 +21,23 @@ function checkDbOptions( $server, $dbname, $dbuser, $dbpass )
 	
 	if( count($fail) == 0 )
 	{
-		$link = @mysql_connect( $server, $dbuser, $dbpass, true );
-		
-		if (!$link)
-			$fail[] = "Could not connect to the server '$server' with the provided username '$dbuser'.";
-		else
-		{
-			if (mysql_select_db( $dbname, $link ))
-			{
-				if( checkForSLAMTables($link, $dbname) > 0)
-					$fail[] = "A SLAM installation already exists on this database.";
-			}
-			else /* try and temporarily create the database */
-			{
-				if( !mysql_query("CREATE DATABASE '$dbname'", $link) )
-					 $fail[] = "Specified database '$dbname' doesn't exist and couldn't be created!";
-				else
-				{
-					if (!mysql_select_db( $dbname, $link ))
-						$fail[] = "Created database '$dbname', but couldn't select it!";
-					
-					mysql_query("DROP DATABASE '$dbname'", $link);
-				}
-			}
-			
-			mysql_close($link);
+		try{
+			$pdo = new PDO("mysql:host={$server};port={$port};dbname={$dbname};charset={$charset}",$dbuser,$dbpass,$pdo_options);
 		}
+		catch (PDOException $e)
+		{
+			$fail[] = "Error connecting to the database server and database name with the provided credentials.";
+			return $fail;
+		}
+		
+		if (!$pdo)
+			$fail[] = "Could not connect to the server '$server' with the provided username '$dbuser'.";
+		elseif( !checkUserPermissions($pdo) )
+			$fail[] = "The specified user does not have all SELECT,INSERT,UPDATE, or DELETE permissions.";
+		elseif( checkForSLAMTables($pdo) > 0)
+			$fail[] = "A SLAM installation already exists on this database.";
+		
+		$pdo = null;
 	}
 	
 	if( count($fail) == 0 )
@@ -49,76 +46,73 @@ function checkDbOptions( $server, $dbname, $dbuser, $dbpass )
 	return $fail;
 }
 
-function checkForSLAMTables( $dblink, $dbname )
+function checkForSLAMTables( $pdo )
 {
-    /* returns a numeric value containing the suitability of the specified database for installing SLAM
-    -1 - error
-    0 - no existing required SLAM tables
-    1 - SLAM_Category table exists
-    2 - SLAM_Researchers table exists
+	/* returns a numeric value containing the suitability of the specified database for installing SLAM
+	0 - no existing required SLAM tables
+	1 - SLAM_Category table exists
+	2 - SLAM_Researchers table exists
 	4 - SLAM_Permissions table exists
-    7 - all tables exist
-    */
-    
-    $sql = "SHOW TABLES FROM $dbname";
-    $result = mysql_query($sql, $dblink);
-
-    if (!$result)
-	return -1;
-    
-    $tables = array();
-    while ($row = mysql_fetch_row($result))
-        $tables[] = $row[0];
-    
-    $ret = 0;
-    if (in_array('SLAM_Researchers', $tables))
-		$ret+=1;
-    if (in_array('SLAM_Categories', $tables))
-		$ret+=2;
-	if (in_array('SLAM_Permissions', $tables))
-		$ret+=4;
-    
-    return $ret;
+	7 - all tables exist
+	*/
+		
+	$ret = 7;
+	try{
+		$pdo->query("SELECT 1 FROM SLAM_Researchers LIMIT 1");
+	}catch (PDOException $e){
+		$ret-=1;
+	}
+	try{
+		$pdo->query("SELECT 1 FROM SLAM_Categories LIMIT 1");
+	}catch (PDOException $e){
+		$ret-=2;
+	}
+	try{
+		$pdo->query("SELECT 1 FROM SLAM_Permissions LIMIT 1");
+	}catch (PDOException $e){
+		$ret-=4;
+	}
+	
+	return $ret;
 }
 
-function getDbUserPrivs($link, $dbuser)
+function checkUserPermissions($pdo)
 {
-	/* inoperative function for now */
-	
-	$q = "SHOW GRANTS";
-	$result = mysql_query( $q, $link );
-	
-	if (!$result)
-		return mysql_error();
-	
-	$privs = array();
-	while( $row = mysql_fetch_row($result) )
-		$privs[] = $row;
-	
-	/* have to do some complex parsing of MySQL's output */
-	
+	/* TODO: this is still hacky and mysql version dependent. */
+
+	/* 
+	try{
+		$result = $pdo->query("SHOW GRANTS FOR CURRENT_USER;")->fetchAll()[0];
+	}catch (PDOException $e){
+		return false;
+	}
+
+	if (stripos($result, 'SELECT') === false)
+		return false;	
+	if (stripos($result, 'INSERT') === false)
+		return false;	
+	if (stripos($result, 'UPDATE') === false)
+		return false;	
+	if (stripos($result, 'DELETE') === false)
+		return false;	
+	*/
 	return true;
 }
 
-function SLAM_write_to_table( $link, $table, $data)
+function SLAM_write_to_table($pdo, $table, $data)
 {
 	$fields = array();
 	$values = array();
 	
-	foreach( $data as $key=>$value )
-	{
-		$key = mysql_real_escape_string( $key, $link );
-		$value = mysql_real_escape_string( $value, $link );
-		
-		$fields[] = "`$key`";
-		$values[] = "'$value'";
+	foreach( $data as $field=>$value ){
+		$fields[] = "`$field`";
+		$values[] = $pdo->quote($value);
 	}
 	
 	$fields = '('.implode( ',', $fields ).')';
 	$values = '('.implode( ',', $values ).')';
 
-	$sql = "INSERT INTO `{$table}` $fields VALUES $values";
-	return mysql_query( $sql, $link );
+	return $pdo->query("INSERT INTO `{$table}` $fields VALUES $values");
 }
 
 ?>

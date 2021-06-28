@@ -23,18 +23,21 @@ class SLAMuser
 			
 			/* extract user project groups */
 			if( $ret['projects'] != '')
-				$this->projects = split(',',$ret['projects']);
+				$this->projects = explode(',',$ret['projects']);
 			else
 				$this->projects = array();
 //			if(count($this->projects) == 0)
 //				$this->projects = array( $this->values['username'] );
 			
-			/* prefs already loaded by loaduser() */
-			if(!is_numeric($this->prefs['default_project_access']))
+			/* prefs already loaded by loaduser(), set defaults if not provided */
+			if(!array_key_exists('default_project_access', $this->prefs) || !is_numeric($this->prefs['default_project_access']))
 				$this->prefs['default_project_access'] = (int)$config->values['permissions']['default_project_access'];
 			
-			if(!is_numeric($this->prefs['default_access']))
+			if(!array_key_exists('default_access', $this->prefs) || !is_numeric($this->prefs['default_access']))
 				$this->prefs['default_access'] = (int)$config->values['permissions']['default_access'];
+
+			if(!array_key_exists('identifiers', $this->prefs))
+				$this->prefs['identifiers'] = array();
 
 			$this->prefs['failed_logins'] = 0;
 		}
@@ -51,19 +54,21 @@ class SLAMuser
 
 		$this->username = $username;
 		
-		/* is the user attempting to log in? */
-		if (array_key_exists('login_username',$_REQUEST) && array_key_exists('login_password',$_REQUEST))
+		if ($password!==false) {
+			/* a password has been explicitly provided */
+		}
+		elseif (array_key_exists('login_username',$_REQUEST) && array_key_exists('login_password',$_REQUEST)) /* is the user attempting to log in? */
 		{
 			$this->username = $_REQUEST['login_username'];
 			$password = $_REQUEST['login_password'];
 		}
-		elseif(array_key_exists('auth',$_REQUEST)) /* is the user sending an auth variable? */
+		elseif(array_key_exists('auth',$_REQUEST) && !is_array($_REQUEST['auth'])) /* is the user sending an auth variable? Note: adminer uses an "auth" header, but it's sent as an array*/
 		{
 			list($this->username,$password) = explode(':',base64_decode($_REQUEST['auth']));
 		}
 		elseif(array_key_exists("slam_".$config->values['lab_prefix'],$_COOKIE)) /* does the user possess an auth cookie? */
 		{
-			$crypt = sql_real_escape(urldecode($_COOKIE["slam_{$config->values['lab_prefix']}"]),$db->link);
+			$crypt = $db->Quote(urldecode($_COOKIE["slam_{$config->values['lab_prefix']}"]));
 			$auth = $db->GetRecords("SELECT * FROM `{$config->values['user_table']}` WHERE `crypt`='$crypt' LIMIT 1");
 			
 			if ($auth === false) //GetRecords returns false on error
@@ -75,6 +80,9 @@ class SLAMuser
 				
 				$this->username = $auth[0]['username'];
 				$this->prefs = unserialize($auth[0]['prefs']);
+				if(!$this->prefs)
+					$this->prefs = array();
+
 				return $auth[0];
 			}
 			
@@ -148,7 +156,7 @@ class SLAMuser
 	
 	function savePrefs(&$config,$db)
 	{
-		$prefs = sql_real_escape(serialize($this->prefs),$db->link);
+		$prefs = $db->Quote(serialize($this->prefs));
 		$q = "UPDATE `{$config->values['user_table']}` SET `prefs`='$prefs' WHERE `username`='$this->username' LIMIT 1";		
 		if (!$db->Query($q))
 		{
