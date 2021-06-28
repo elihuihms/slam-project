@@ -9,7 +9,7 @@
 		<a href='https://github.com/steelsnowflake/slam/' target='_blank'>github.com/steelsnowflake/slam</a>
 	</div>
 	<div>
-		<p style='font-weight:bold;margin-bottom:5px'>&copy; 2012-2019 <a href='http://steelsnowflake.com'>SteelSnowflake LLC</a></p>
+		<p style='font-weight:bold;margin-bottom:5px'>&copy; 2012-2021 <a href='http://steelsnowflake.com'>SteelSnowflake LLC</a></p>
 	</div>
 	<div>
 		<p style='font-weight:bold;margin-bottom:5px'>Special thanks:</p>
