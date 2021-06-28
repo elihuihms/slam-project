@@ -21,9 +21,8 @@ SLAM includes code from the Adminer project (www.adminer.org), which is licensed
 
 ### Downloading a SLAM package
 
-You can download a complete archive from the following locations, untar/unzip it onto your web server, and you're good to go:
+You can download a complete archive from github, untar/unzip it onto your web server, and be good to go:
 
-* http://steelsnowflake.com/downloads/?t=slam-versions
 * https://github.com/steelsnowflake/slam/archive/master.zip
 
 ### From GitHub
@@ -39,7 +38,11 @@ Once SLAM has been saved to your server, navigate to yourserver.com/slam/install
 
 Installation to an Amazon Elastic Beanstalk is the recommended deployment option for most users. Select the preconfigured AWS PHP platform, upload a SLAM .zip archive to initialize the environment, add a MySQL RDS, and once the environment is stable, navigate to the environment's URL to complete installation.
 
-If the database is added to the platform prior to running the installer, the environment's RDS connection and authentication settings will be provided as defaults during installation.
+If the database is added to the platform prior to running the installer, the environment's RDS connection and authentication settings will be provided as defaults during SLAM configuration.
+
+### Docker
+
+A demo docker-compose.yml file is provided and can get you up and running with SLAM, MariaDB, and phpMyAdmin. Assuming you have Docker installed, just cd into the SLAM directory, and type `docker-compose up --build`. The default root password for mariadb is "password". Point your browser to http://localhost:8080 for the phpmyadmin interface to create a new slam database and user to set during the SLAM configure process.
 
 # Advanced
 

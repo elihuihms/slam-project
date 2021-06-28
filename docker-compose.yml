@@ -14,15 +14,21 @@ services:
     image: mariadb
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: example
+      MYSQL_ROOT_PASSWORD: password
     volumes:
       - mariadbdata:/var/lib/mysql
 
-  adminer:
-    image: adminer
+  myadmin:
+    image: phpmyadmin
     restart: always
     ports:
-      - 8080:8080
+      - 8080:80
+
+#  adminer:
+#    image: adminer
+#    restart: always
+#    ports:
+#      - 8080:8080
 
 volumes:
   mariadbdata:

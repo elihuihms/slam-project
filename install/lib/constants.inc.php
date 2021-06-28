@@ -4,7 +4,7 @@
 	# SLAM installer
 	#
 
-	$slam_version = '1.2';
+	$slam_version = '1.3';
 	
 	$req_php_version = '7.0.0';
 
