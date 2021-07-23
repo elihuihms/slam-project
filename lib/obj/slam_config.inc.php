@@ -60,9 +60,6 @@ class SLAMconfig
 			exit("The \"category_table\" option in the \"configuration.ini\" file is missing. Please check your configuration file or contact your system administrator.");
 
 		$this->values['adminer_path'] = $this->values['path'].DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR.'adminer.php';
-		if (!file_exists($this->values['adminer_path'])) {
-			$this->errors[] = "Note: Adminer is not installed.";
-		}
 
 		return;
 	}
